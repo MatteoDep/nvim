@@ -204,8 +204,8 @@ map <F7> :setlocal nospell<CR>
 " easier exploration/substitution {{{
 " fzf
 map <leader>e :Files<CR>
-vnoremap <leader>g y:Rg <C-r>=escape(@",'/\')<CR><CR>
-nnoremap <leader>g yiw:Rg <C-r>=escape(@",'/\')<CR><CR>
+vnoremap gR y:Rg <C-r>=escape(@",'/\')<CR><CR>
+nnoremap gR yiw:Rg <C-r>=escape(@",'/\')<CR><CR>
 " search text in buffer
 vnoremap <leader>f y/\V<C-R>=escape(@",'/\')<CR><CR>
 nnoremap <leader>f yiw/\V<C-R>=escape(@",'/\')<CR><CR>
@@ -262,14 +262,12 @@ imap <tab> <Plug>(completion_smart_tab)
 " }}}
 
 " tabular {{{
-if exists(":Tabularize")
-  nmap <Leader>a= :Tabularize /=<CR>
-  vmap <Leader>a= :Tabularize /=<CR>
-  nmap <Leader>a: :Tabularize /:\zs<CR>
-  vmap <Leader>a: :Tabularize /:\zs<CR>
-  nmap <Leader>a, :Tabularize /,\zs<CR>
-  vmap <Leader>a, :Tabularize /,\zs<CR>
-endif
+nmap <leader>a= :Tabularize /=<CR>
+vmap <leader>a= :Tabularize /=<CR>
+nmap <leader>a: :Tabularize /:\zs<CR>
+vmap <leader>a: :Tabularize /:\zs<CR>
+nmap <leader>a, :Tabularize /,\zs<CR>
+vmap <leader>a, :Tabularize /,\zs<CR>
 " }}}
 
 " debugging {{{
@@ -284,12 +282,20 @@ endif
     nnoremap <silent> <leader>drl :lua require'dap'.repl.run_last()<CR>
 " }}}
 
+" git {{{
+nnoremap <leader>gs :G<CR>
+nnoremap <leader>gh :diffget //2<CR>
+nnoremap <leader>gl :diffget //3<CR>
+" }}}
+
 " }}}
 
 " SNIPPETS {{{
 
 " emmet
 let g:user_emmet_leader_key=','
+let g:user_emmet_install_global = 0
+autocmd FileType html,css EmmetInstall
 
 " ultisnips
 let g:UltiSnipsExpandTrigger="<c-j>"
