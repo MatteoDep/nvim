@@ -284,6 +284,7 @@ vmap <leader>a, :Tabularize /,\zs<CR>
 
 " git {{{
 nnoremap <leader>gs :G<CR>
+nnoremap <leader>gp :G push<CR>
 nnoremap <leader>gh :diffget //2<CR>
 nnoremap <leader>gl :diffget //3<CR>
 " }}}
