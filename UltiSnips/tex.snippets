@@ -1,0 +1,68 @@
+snippet fig 
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=.6\textwidth]{$1}
+	\caption{$2}
+	\label{fig:$3}
+\end{figure}
+
+$0
+endsnippet
+
+snippet fig2
+\begin{figure}[ht]
+	\begin{minipage}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{$1}
+		\caption{$2}
+		\label{fig:$3}
+	\end{minipage}
+	\hspace{2em}
+	\begin{minipage}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{$4}
+		\caption{$5}
+		\label{fig:$6}
+	\end{minipage}
+\end{figure}
+
+$0
+endsnippet
+
+snippet be
+\begin{$1}
+	$2
+\end{$1}
+
+$0
+endsnippet
+
+snippet eq
+\begin{equation}
+	$1
+\end{equation}
+
+$0
+endsnippet
+
+snippet s
+\section{$1}
+
+$0
+endsnippet
+
+snippet ss
+\subsection{$1}
+
+$0
+endsnippet
+
+snippet sss
+\subsubsection{$1}
+
+$0
+endsnippet
+
+snippet i
+\item{$1}
+endsnippet

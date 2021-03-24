@@ -1,0 +1,321 @@
+" _   ___     _____ __  __                    __ _
+" | \ | \ \   / /_ _|  \/  |   ___ ___  _ __  / _(_) __ _ ___
+" |  \| |\ \ / / | || |\/| |  / __/ _ \| '_ \| |_| |/ _` / __|
+" | |\  | \ V /  | || |  | | | (_| (_) | | | |  _| | (_| \__ \
+" |_| \_|  \_/  |___|_|  |_|  \___\___/|_| |_|_| |_|\__, |___/
+"                                                  |___/
+
+" PLUGINS {{{
+
+call plug#begin('~/.config/nvim/plugged')
+
+" color scheme
+Plug 'morhetz/gruvbox'
+
+" status line
+Plug 'vim-airline/vim-airline'
+
+" handle what surrounds a text object
+Plug 'tpope/vim-surround'
+
+" handle comments
+Plug 'tpope/vim-commentary'
+
+" extend repeat (.) abilities
+Plug 'tpope/vim-repeat'
+
+" git in vim!
+Plug 'tpope/vim-fugitive'
+
+" folds
+Plug 'tmhedberg/SimpylFold'
+
+" align text (before vim-markdown)
+Plug 'godlygeek/tabular'
+
+" markdown
+Plug 'plasticboy/vim-markdown'
+
+" lsp
+Plug 'neovim/nvim-lspconfig'
+Plug 'anott03/nvim-lspinstall'
+
+" complete
+Plug 'nvim-lua/completion-nvim'
+Plug 'steelsojka/completion-buffers'
+
+" snippets tool
+Plug 'SirVer/ultisnips'
+
+" html fast coding
+Plug 'mattn/emmet-vim'
+
+" fzf
+Plug 'junegunn/fzf'
+Plug 'junegunn/fzf.vim'
+
+" treesitter
+" Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+
+" debugging
+Plug 'mfussenegger/nvim-dap'
+" Plug 'mfussenegger/nvim-dap-python'
+
+" float terminal
+Plug 'voldikss/vim-floaterm'
+
+" color previews
+Plug 'rrethy/vim-hexokinase', { 'do': 'make hexokinase' }
+
+call plug#end()
+
+" Interesting for the future: {{{
+" for asynchronous file-specific compiling
+" https://github.com/tpope/vim-dispatch
+" for case invariant abbreviations, substitution and change the case style of your variables
+" https://github.com/tpope/vim-abolish
+
+" }}}
+
+" }}}
+
+" GENERAL CONFIGS {{{
+
+" general {{{
+syntax enable							" Enables syntax highlighting
+filetype plugin on		        		" vim built-in plugins
+set omnifunc=syntaxcomplete#Complete 	" default omni completion
+set shada+=n~/.config/nvim/main.shada	" change viminfo location
+set hidden 			            		" To keep multiple buffers open
+set wrap			            		" wrap long lines
+set encoding=utf-8		        		" The encoding displayed
+set number relativenumber	    		" See line numbers and relative numbers
+set autoindent			        		" Automatically leave space at the left as the starting line
+set ruler			            		" Always display cursor
+set wildmenu                    		" command-line completion enhanced
+set wildmode=longest,list,full			" Display all matching files when tab complete
+set nohlsearch                    		" don't highlight search
+set incsearch			        		" incremental search
+set noerrorbells                		" disable sound error effects
+set conceallevel=2
+" }}}
+
+" theme {{{
+let g:gruv_box_contrast_dark = 'hard'
+let g:gruvbox_invert_selection = '0'
+colorscheme gruvbox
+set background=dark
+set termguicolors   " enable color previews
+" airline
+let g:airline#extensions#tabline#enabled = 1
+" }}}
+
+" tabs {{{
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+set expandtab
+" }}}
+
+" python support {{{
+let g:loaded_python_provider = 0
+let g:python3_host_prog = '~/.config/nvim/nvim-pyenv/bin/python'
+" }}}
+
+" lsp {{{
+lua require('lsp_config')
+" auto formatting on save
+autocmd BufWrite *.py lua vim.lsp.buf.formatting_sync(nil, 1000)
+" }}}
+
+" debugging {{{
+lua require('dap_config')
+" }}}
+
+" folding {{{
+set foldmethod=syntax
+autocmd Filetype vim set foldmethod=marker
+" }}}
+
+" markdown {{{
+let g:vim_markdown_toc_autofit = 1
+let g:vim_markdown_frontmatter = 1
+let g:vim_markdown_math = 1
+let g:vim_markdown_strikethrough = 1
+let g:vim_markdown_new_list_item_indent = 0
+" }}}
+
+" general autocmds {{{
+augroup VimStartup
+	au!
+	au VimEnter * if expand("%") == "" | Explore | endif
+augroup END
+" remove trailing spaces on save
+autocmd BufWrite * :%s/\s\+$//e
+autocmd BufNewFile,BufRead requirements*.txt set ft=python
+" }}}
+
+" floaterm {{{
+let g:floaterm_title  = "terminal"
+let g:floaterm_height = 0.8
+let g:floaterm_width  = 0.8
+" }}}
+
+" }}}
+
+" AUTOCOMPLETE {{{
+
+" Use completion-nvim in every buffer
+autocmd BufEnter * lua require'completion'.on_attach()
+" add fuzzy completion
+let g:completion_matching_strategy_list = ['exact', 'substring', 'fuzzy']
+" Avoid showing message extra message when using completion
+set shortmess+=c
+set completeopt=menuone,noinsert,noselect
+
+" sources
+let g:completion_enable_snippet = 'UltiSnips'
+let g:completion_auto_change_source = 1
+let g:completion_chain_complete_list = [
+    \{'complete_items': ['lsp', 'snippet']},
+    \{ 'complete_items': ['buffers'] },
+    \{'mode': '<c-p>'},
+    \{'mode': '<c-n>'},
+\]
+
+" }}}
+
+" KEY BINDINGS {{{
+
+let mapleader =" "
+
+" general {{{
+" Source Vim configuration file and install plugins
+nnoremap <silent><leader>1 :source $MYVIMRC \| :PlugInstall<CR>
+" access system clipboard
+vnoremap <leader>y "+y
+noremap <leader>p "+p
+noremap <leader>P "+P
+" spell check
+map <F6> :setlocal spell spelllang=en_gb,it<CR>
+map <F7> :setlocal nospell<CR>
+" }}}
+
+" easier exploration/substitution {{{
+" fzf
+map <leader>e :Files<CR>
+vnoremap <leader>g y:Rg <C-r>=escape(@",'/\')<CR><CR>
+nnoremap <leader>g yiw:Rg <C-r>=escape(@",'/\')<CR><CR>
+" search text in buffer
+vnoremap <leader>f y/\V<C-R>=escape(@",'/\')<CR><CR>
+nnoremap <leader>f yiw/\V<C-R>=escape(@",'/\')<CR><CR>
+" substitute text in buffer
+vnoremap <leader>s y:%s/\V<C-R>=escape(@",'/\')<CR>//gc<Left><Left><Left>
+nnoremap <leader>s yiw:%s/\V<C-R>=escape(@",'/\')<CR>//gc<Left><Left><Left>
+" }}}
+
+" easier navigation {{{
+" navigate through buffers
+nnoremap <leader>k :bnext<CR>
+nnoremap <leader>j :bprev<CR>
+nnoremap <leader>x :w<CR>:bdel<CR>
+nnoremap <leader>b :Buffers<CR>
+
+" navigate through splits
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+" quickfix movements
+nnoremap <leader>n :cnext<CR>
+nnoremap <leader>N :cprev<CR>
+nnoremap <leader>q :cclose<CR>
+" }}}
+
+" floaterm {{{
+let g:floaterm_keymap_new    = '<F9>'
+let g:floaterm_keymap_prev   = '<F10>'
+let g:floaterm_keymap_next   = '<F11>'
+let g:floaterm_keymap_toggle = '<F12>'
+" }}}
+
+" LSP {{{
+
+" nvim-lsp
+nnoremap <silent> gD <cmd>lua vim.lsp.buf.declaration()<CR>
+nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<CR>
+nnoremap <silent> gh <cmd>lua vim.lsp.buf.hover()<CR>
+nnoremap <silent> gi <cmd>lua vim.lsp.buf.implementation()<CR>
+nnoremap <silent> gs <cmd>lua vim.lsp.buf.signature_help()<CR>
+nnoremap <silent> gt <cmd>lua vim.lsp.buf.type_definition()<CR>
+nnoremap <silent> gn <cmd>lua vim.lsp.buf.rename()<CR>
+nnoremap <silent> gr <cmd>lua vim.lsp.buf.references()<CR>
+nnoremap <silent> [g <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
+nnoremap <silent> ]g <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
+" }}}
+
+" completion {{{
+inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+imap <tab> <Plug>(completion_smart_tab)
+" }}}
+
+" tabular {{{
+if exists(":Tabularize")
+  nmap <Leader>a= :Tabularize /=<CR>
+  vmap <Leader>a= :Tabularize /=<CR>
+  nmap <Leader>a: :Tabularize /:\zs<CR>
+  vmap <Leader>a: :Tabularize /:\zs<CR>
+  nmap <Leader>a, :Tabularize /,\zs<CR>
+  vmap <Leader>a, :Tabularize /,\zs<CR>
+endif
+" }}}
+
+" debugging {{{
+    nnoremap <silent> <leader>dc :lua require'dap'.continue()<CR>
+    nnoremap <silent> <leader>dj :lua require'dap'.step_over()<CR>
+    nnoremap <silent> <leader>dl :lua require'dap'.step_into()<CR>
+    nnoremap <silent> <leader>dh :lua require'dap'.step_out()<CR>
+    nnoremap <silent> <leader>dt :lua require'dap'.toggle_breakpoint()<CR>
+    nnoremap <silent> <leader>ds :lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>
+    nnoremap <silent> <leader>dsl :lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>
+    nnoremap <silent> <leader>dr :lua require'dap'.repl.open()<CR>
+    nnoremap <silent> <leader>drl :lua require'dap'.repl.run_last()<CR>
+" }}}
+
+" }}}
+
+" SNIPPETS {{{
+
+" emmet
+let g:user_emmet_leader_key=','
+
+" ultisnips
+let g:UltiSnipsExpandTrigger="<c-j>"
+let g:UltiSnipsJumpForwardTrigger="<c-j>"
+let g:UltiSnipsJumpBackwardTrigger="<c-k>"
+
+" groff special characters shortcuts
+autocmd Filetype groff inoremap á \*[']a
+autocmd Filetype groff inoremap Á \*[']A
+autocmd Filetype groff inoremap é \*[']e
+autocmd Filetype groff inoremap É \*[']E
+autocmd Filetype groff inoremap í \*[']i
+autocmd Filetype groff inoremap Í \*[']I
+autocmd Filetype groff inoremap ó \*[']o
+autocmd Filetype groff inoremap Ó \*[']O
+autocmd Filetype groff inoremap ú \*[']u
+autocmd Filetype groff inoremap Ú \*[']U
+autocmd Filetype groff inoremap à \*[`]a
+autocmd Filetype groff inoremap À \*[`]A
+autocmd Filetype groff inoremap è \*[`]e
+autocmd Filetype groff inoremap È \*[`]E
+autocmd Filetype groff inoremap ì \*[`]i
+autocmd Filetype groff inoremap Ì \*[`]I
+autocmd Filetype groff inoremap ò \*[`]o
+autocmd Filetype groff inoremap Ò \*[`]O
+autocmd Filetype groff inoremap ù \*[`]u
+autocmd Filetype groff inoremap Ù \*[`]U
+
+" }}}

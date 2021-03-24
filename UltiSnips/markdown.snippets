@@ -1,0 +1,37 @@
+snippet new
+---
+title: "$1"
+author: "${2:Matteo De Pellegrin}"
+date: "${3:`date +"%Y %B %d"`}"
+output:
+	${4:pdf_document}:
+		toc: false
+		number_sections: true
+---
+
+# $1
+
+$0
+endsnippet
+
+snippet date
+`date +"%Y %B %d"`$0
+endsnippet
+
+snippet l
+[${1:${VISUAL}}]($2)$0
+endsnippet
+
+snippet im
+![${1:${VISUAL}}]($2)$0
+endsnippet
+
+snippet iml
+![${1:${VISUAL}}\label{$2}]($3)$0
+endsnippet
+
+snippet code
+\`\`\`$1
+${2:${VISUAL}}
+\`\`\`
+endsnippet
