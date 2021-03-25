@@ -187,7 +187,7 @@ let g:completion_chain_complete_list = [
 
 " KEY BINDINGS {{{
 
-let mapleader =" "
+let mapleader = " "
 
 " general {{{
 " Source Vim configuration file and install plugins
@@ -283,6 +283,7 @@ vmap <leader>a, :Tabularize /,\zs<CR>
 " }}}
 
 " git {{{
+nnoremap <leader>gg :G<Space>
 nnoremap <leader>gs :G<CR>
 nnoremap <leader>gp :G push<CR>
 nnoremap <leader>gh :diffget //2<CR>
