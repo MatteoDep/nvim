@@ -14,8 +14,13 @@ def print_doc(snip, text):
 endglobal
 
 
-snippet new
+snippet #!
 #!/usr/bin/env python
+endsnippet
+
+
+snippet new
+# -*- coding: utf-8 -*-
 """
 ${1:`!v expand("%:r:t")`}.
 
@@ -29,7 +34,7 @@ endsnippet
 
 
 snippet adi-new
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 ${1:`!v expand("%:r:t")`}.
 
