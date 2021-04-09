@@ -15,6 +15,9 @@ Plug 'morhetz/gruvbox'
 " status line
 Plug 'vim-airline/vim-airline'
 
+" icons
+Plug 'ryanoasis/vim-devicons'
+
 " handle what surrounds a text object
 Plug 'tpope/vim-surround'
 
@@ -53,9 +56,6 @@ Plug 'mattn/emmet-vim'
 " fzf
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
-
-" treesitter
-" Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
 " debugging
 Plug 'mfussenegger/nvim-dap'
@@ -108,6 +108,8 @@ set background=dark
 set termguicolors   " enable color previews
 " airline
 let g:airline#extensions#tabline#enabled = 1
+let g:webdevicons_enable_airline_tabline = 1
+let g:webdevicons_enable_airline_statusline = 1
 " }}}
 
 " tabs {{{
@@ -134,6 +136,7 @@ lua require('dap_config')
 
 " folding {{{
 set foldmethod=syntax
+autocmd BufEnter,BufRead vifmrc set foldmethod=marker
 autocmd Filetype vim set foldmethod=marker
 " }}}
 
@@ -152,7 +155,6 @@ augroup VimStartup
 augroup END
 " remove trailing spaces on save
 autocmd BufWrite * :%s/\s\+$//e
-autocmd BufNewFile,BufRead requirements*.txt set ft=python
 " }}}
 
 " floaterm {{{
@@ -203,23 +205,26 @@ map <F7> :setlocal nospell<CR>
 
 " easier exploration/substitution {{{
 " fzf
-map <leader>e :Files<CR>
+nnoremap <A-e> :Explore<CR>
+nnoremap <A-f> :Files<CR>
+nnoremap <A-g> :GFiles<CR>
+nnoremap <A-l> :Lines<CR>
+nnoremap <A-b> :Buffers<CR>
 vnoremap gR y:Rg <C-r>=escape(@",'/\')<CR><CR>
 nnoremap gR yiw:Rg <C-r>=escape(@",'/\')<CR><CR>
 " search text in buffer
-vnoremap <leader>f y/\V<C-R>=escape(@",'/\')<CR><CR>
-nnoremap <leader>f yiw/\V<C-R>=escape(@",'/\')<CR><CR>
+vnoremap <leader>f y:BLines <C-R>=escape(@",'/\')<CR><CR>
+nnoremap <leader>f yiw:BLines <C-R>=escape(@",'/\')<CR><CR>
 " substitute text in buffer
 vnoremap <leader>s y:%s/\V<C-R>=escape(@",'/\')<CR>//gc<Left><Left><Left>
-nnoremap <leader>s yiw:%s/\V<C-R>=escape(@",'/\')<CR>//gc<Left><Left><Left>
+nnoremap <leader>s yiw:%s/\<<C-R>"\>//gc<Left><Left><Left>
 " }}}
 
 " easier navigation {{{
 " navigate through buffers
-nnoremap <leader>k :bnext<CR>
-nnoremap <leader>j :bprev<CR>
-nnoremap <leader>x :w<CR>:bdel<CR>
-nnoremap <leader>b :Buffers<CR>
+nnoremap <Tab> :bnext<CR>
+nnoremap <S-Tab> :bprev<CR>
+nnoremap ZX :bdel<CR>
 
 " navigate through splits
 nnoremap <C-h> <C-w>h
@@ -228,9 +233,9 @@ nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
 
 " quickfix movements
-nnoremap <leader>n :cnext<CR>
-nnoremap <leader>N :cprev<CR>
-nnoremap <leader>q :cclose<CR>
+nnoremap <C-n> :cnext<CR>
+nnoremap <C-p> :cprev<CR>
+nnoremap <C-q> :cclose<CR>
 " }}}
 
 " floaterm {{{
@@ -259,6 +264,9 @@ nnoremap <silent> ]g <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
 inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 imap <tab> <Plug>(completion_smart_tab)
+" Insert mode completion of paths with fzf
+inoremap <expr> <A-i> fzf#vim#complete#path('fd')
+inoremap <expr> /<A-i> fzf#vim#complete#path('locate /')
 " }}}
 
 " tabular {{{
@@ -284,12 +292,17 @@ vmap <leader>a, :Tabularize /,\zs<CR>
 
 " git {{{
 nnoremap <leader>gg :G<Space>
-nnoremap <leader>gs :G<CR>
+nnoremap <leader>gs :G<CR>4j
 nnoremap <leader>gp :G push<CR>
 nnoremap <leader>gh :diffget //2<CR>
 nnoremap <leader>gl :diffget //3<CR>
 " }}}
 
+" forgot my mappings! {{{
+" Mapping selecting mappings
+nmap <leader><tab> <plug>(fzf-maps-n)
+xmap <leader><tab> <plug>(fzf-maps-x)
+omap <leader><tab> <plug>(fzf-maps-o)
 " }}}
 
 " SNIPPETS {{{
