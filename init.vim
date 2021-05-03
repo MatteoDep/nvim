@@ -10,7 +10,8 @@
 call plug#begin('~/.config/nvim/plugged')
 
 " color scheme
-Plug 'morhetz/gruvbox'
+" Plug 'morhetz/gruvbox'
+Plug 'arcticicestudio/nord-vim'
 
 " status line
 Plug 'vim-airline/vim-airline'
@@ -41,7 +42,6 @@ Plug 'plasticboy/vim-markdown'
 
 " lsp
 Plug 'neovim/nvim-lspconfig'
-Plug 'anott03/nvim-lspinstall'
 
 " complete
 Plug 'nvim-lua/completion-nvim'
@@ -58,8 +58,7 @@ Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 
 " debugging
-Plug 'mfussenegger/nvim-dap'
-" Plug 'mfussenegger/nvim-dap-python'
+" Plug 'mfussenegger/nvim-dap'
 
 " float terminal
 Plug 'voldikss/vim-floaterm'
@@ -87,7 +86,7 @@ filetype plugin on		        		" vim built-in plugins
 set omnifunc=syntaxcomplete#Complete 	" default omni completion
 set shada+=n~/.config/nvim/main.shada	" change viminfo location
 set hidden 			            		" To keep multiple buffers open
-set wrap			            		" wrap long lines
+set nowrap			            		" wrap long lines
 set encoding=utf-8		        		" The encoding displayed
 set number relativenumber	    		" See line numbers and relative numbers
 set autoindent			        		" Automatically leave space at the left as the starting line
@@ -101,15 +100,18 @@ set conceallevel=2
 " }}}
 
 " theme {{{
-let g:gruv_box_contrast_dark = 'hard'
-let g:gruvbox_invert_selection = '0'
-colorscheme gruvbox
+" let g:gruv_box_contrast_dark = 'hard'
+" let g:gruvbox_invert_selection = '0'
+" colorscheme gruvbox
+colorscheme nord
 set background=dark
 set termguicolors   " enable color previews
 " airline
 let g:airline#extensions#tabline#enabled = 1
 let g:webdevicons_enable_airline_tabline = 1
 let g:webdevicons_enable_airline_statusline = 1
+" hexokinase
+let g:Hexokinase_highlighters = ['backgroundfull']
 " }}}
 
 " tabs {{{
@@ -124,19 +126,13 @@ let g:loaded_python_provider = 0
 let g:python3_host_prog = '~/.config/nvim/nvim-pyenv/bin/python'
 " }}}
 
-" lsp {{{
-lua require('lsp_config')
-" auto formatting on save
-autocmd BufWrite *.py lua vim.lsp.buf.formatting_sync(nil, 1000)
-" }}}
-
 " debugging {{{
-lua require('dap_config')
+" lua require('dap_config')
 " }}}
 
 " folding {{{
 set foldmethod=syntax
-autocmd BufEnter,BufRead vifmrc set foldmethod=marker
+autocmd BufEnter,BufRead *rc set foldmethod=marker
 autocmd Filetype vim set foldmethod=marker
 " }}}
 
@@ -159,8 +155,17 @@ autocmd BufWrite * :%s/\s\+$//e
 
 " floaterm {{{
 let g:floaterm_title  = "terminal"
+let g:floaterm_wintype  = "split"
 let g:floaterm_height = 0.8
 let g:floaterm_width  = 0.8
+" }}}
+
+" LSP {{{
+lua require('lsp_config')
+" }}}
+
+" fzf {{{
+let g:fzf_layout = { 'down': '50%' }
 " }}}
 
 " }}}
@@ -213,8 +218,8 @@ nnoremap <A-b> :Buffers<CR>
 vnoremap gR y:Rg <C-r>=escape(@",'/\')<CR><CR>
 nnoremap gR yiw:Rg <C-r>=escape(@",'/\')<CR><CR>
 " search text in buffer
-vnoremap <leader>f y:BLines <C-R>=escape(@",'/\')<CR><CR>
-nnoremap <leader>f yiw:BLines <C-R>=escape(@",'/\')<CR><CR>
+vnoremap <leader>l y:BLines <C-R>=escape(@",'/\')<CR><CR>
+nnoremap <leader>l yiw:BLines <C-R>=escape(@",'/\')<CR><CR>
 " substitute text in buffer
 vnoremap <leader>s y:%s/\V<C-R>=escape(@",'/\')<CR>//gc<Left><Left><Left>
 nnoremap <leader>s yiw:%s/\<<C-R>"\>//gc<Left><Left><Left>
@@ -245,19 +250,17 @@ let g:floaterm_keymap_next   = '<F11>'
 let g:floaterm_keymap_toggle = '<F12>'
 " }}}
 
-" LSP {{{
-
-" nvim-lsp
+" lsp {{{
 nnoremap <silent> gD <cmd>lua vim.lsp.buf.declaration()<CR>
 nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<CR>
-nnoremap <silent> gh <cmd>lua vim.lsp.buf.hover()<CR>
-nnoremap <silent> gi <cmd>lua vim.lsp.buf.implementation()<CR>
-nnoremap <silent> gs <cmd>lua vim.lsp.buf.signature_help()<CR>
-nnoremap <silent> gt <cmd>lua vim.lsp.buf.type_definition()<CR>
-nnoremap <silent> gn <cmd>lua vim.lsp.buf.rename()<CR>
+nnoremap <silent> K <cmd>lua vim.lsp.buf.hover()<CR>
+nnoremap <silent> <C-k> <cmd>lua vim.lsp.buf.signature_help()<CR>
+nnoremap <silent> <leader>rn <cmd>lua vim.lsp.buf.rename()<CR>
 nnoremap <silent> gr <cmd>lua vim.lsp.buf.references()<CR>
-nnoremap <silent> [g <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
-nnoremap <silent> ]g <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
+nnoremap <silent> [d <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
+nnoremap <silent> ]d <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
+nnoremap <silent> <space>f <cmd>lua vim.lsp.buf.formatting()<CR>
+vnoremap <silent> <space>f <cmd>lua vim.lsp.buf.range_formatting()<CR>
 " }}}
 
 " completion {{{
@@ -279,15 +282,15 @@ vmap <leader>a, :Tabularize /,\zs<CR>
 " }}}
 
 " debugging {{{
-    nnoremap <silent> <leader>dc :lua require'dap'.continue()<CR>
-    nnoremap <silent> <leader>dj :lua require'dap'.step_over()<CR>
-    nnoremap <silent> <leader>dl :lua require'dap'.step_into()<CR>
-    nnoremap <silent> <leader>dh :lua require'dap'.step_out()<CR>
-    nnoremap <silent> <leader>dt :lua require'dap'.toggle_breakpoint()<CR>
-    nnoremap <silent> <leader>ds :lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>
-    nnoremap <silent> <leader>dsl :lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>
-    nnoremap <silent> <leader>dr :lua require'dap'.repl.open()<CR>
-    nnoremap <silent> <leader>drl :lua require'dap'.repl.run_last()<CR>
+nnoremap <silent> <leader>dc :lua require'dap'.continue()<CR>
+nnoremap <silent> <leader>dj :lua require'dap'.step_over()<CR>
+nnoremap <silent> <leader>dl :lua require'dap'.step_into()<CR>
+nnoremap <silent> <leader>dh :lua require'dap'.step_out()<CR>
+nnoremap <silent> <leader>dt :lua require'dap'.toggle_breakpoint()<CR>
+nnoremap <silent> <leader>ds :lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>
+nnoremap <silent> <leader>dsl :lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>
+nnoremap <silent> <leader>dr :lua require'dap'.repl.open()<CR>
+nnoremap <silent> <leader>drl :lua require'dap'.repl.run_last()<CR>
 " }}}
 
 " git {{{
@@ -296,13 +299,6 @@ nnoremap <leader>gs :G<CR>4j
 nnoremap <leader>gp :G push<CR>
 nnoremap <leader>gh :diffget //2<CR>
 nnoremap <leader>gl :diffget //3<CR>
-" }}}
-
-" forgot my mappings! {{{
-" Mapping selecting mappings
-nmap <leader><tab> <plug>(fzf-maps-n)
-xmap <leader><tab> <plug>(fzf-maps-x)
-omap <leader><tab> <plug>(fzf-maps-o)
 " }}}
 
 " SNIPPETS {{{
@@ -338,5 +334,7 @@ autocmd Filetype groff inoremap ò \*[`]o
 autocmd Filetype groff inoremap Ò \*[`]O
 autocmd Filetype groff inoremap ù \*[`]u
 autocmd Filetype groff inoremap Ù \*[`]U
+
+" }}}
 
 " }}}

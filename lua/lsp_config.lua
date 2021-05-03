@@ -1,4 +1,5 @@
 -- LSP ------------------------------------------------------------------------
+
 local nvim_lsp = require('lspconfig')
 
 nvim_lsp.pyls.setup{
@@ -11,5 +12,6 @@ nvim_lsp.pyls.setup{
         };
     };
 }
-require'lspconfig'.ccls.setup{}
-require'lspconfig'.bashls.setup{}
+nvim_lsp.ccls.setup{}
+nvim_lsp.bashls.setup{}
+
