@@ -53,6 +53,12 @@ ${5:${VISUAL}}
 $0
 endsnippet
 
+snippet main
+if __name__ == "__main__":
+	$0
+endsnippet
+
+
 snippet "\((.*)\):\.d" "create docstring" r
 `!p snip.rv = "(" + match.group(1) + "):"`
 	"""

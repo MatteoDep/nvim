@@ -1,1 +1,2 @@
-set foldlevel=1
+setlocal foldlevel=1
+setlocal formatoptions+=n
