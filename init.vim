@@ -3,7 +3,7 @@
 " |  \| |\ \ / / | || |\/| |  / __/ _ \| '_ \| |_| |/ _` / __|
 " | |\  | \ V /  | || |  | | | (_| (_) | | | |  _| | (_| \__ \
 " |_| \_|  \_/  |___|_|  |_|  \___\___/|_| |_|_| |_|\__, |___/
-"                                                  |___/
+"                                                   |___/
 
 " PLUGINS {{{
 
@@ -248,6 +248,7 @@ let g:floaterm_keymap_new    = '<F9>'
 let g:floaterm_keymap_prev   = '<F10>'
 let g:floaterm_keymap_next   = '<F11>'
 let g:floaterm_keymap_toggle = '<F12>'
+tnoremap <A-]> <C-\><C-n>
 " }}}
 
 " lsp {{{
@@ -301,6 +302,8 @@ nnoremap <leader>gh :diffget //2<CR>
 nnoremap <leader>gl :diffget //3<CR>
 " }}}
 
+" }}}
+
 " SNIPPETS {{{
 
 " emmet
@@ -313,28 +316,41 @@ let g:UltiSnipsExpandTrigger="<c-j>"
 let g:UltiSnipsJumpForwardTrigger="<c-j>"
 let g:UltiSnipsJumpBackwardTrigger="<c-k>"
 
+" auto complete parentesis
+augroup AutoClose
+	au!
+	au FileType sh,python,cpp,c,vim,markdown,latex inoremap ( ()<Left>
+	au FileType sh,python,cpp,c,vim,markdown,latex inoremap [ []<Left>
+	au FileType sh,python,cpp,c,vim,markdown,latex inoremap { {}<Left>
+	au FileType sh,python,cpp,c,vim,markdown,latex inoremap ' ''<Left>
+	au FileType sh,python,cpp,c,markdown,latex inoremap " ""<Left>
+	au FileType vim inoremap < <><Left>
+augroup END
+
 " groff special characters shortcuts
-autocmd Filetype groff inoremap á \*[']a
-autocmd Filetype groff inoremap Á \*[']A
-autocmd Filetype groff inoremap é \*[']e
-autocmd Filetype groff inoremap É \*[']E
-autocmd Filetype groff inoremap í \*[']i
-autocmd Filetype groff inoremap Í \*[']I
-autocmd Filetype groff inoremap ó \*[']o
-autocmd Filetype groff inoremap Ó \*[']O
-autocmd Filetype groff inoremap ú \*[']u
-autocmd Filetype groff inoremap Ú \*[']U
-autocmd Filetype groff inoremap à \*[`]a
-autocmd Filetype groff inoremap À \*[`]A
-autocmd Filetype groff inoremap è \*[`]e
-autocmd Filetype groff inoremap È \*[`]E
-autocmd Filetype groff inoremap ì \*[`]i
-autocmd Filetype groff inoremap Ì \*[`]I
-autocmd Filetype groff inoremap ò \*[`]o
-autocmd Filetype groff inoremap Ò \*[`]O
-autocmd Filetype groff inoremap ù \*[`]u
-autocmd Filetype groff inoremap Ù \*[`]U
+augroup Groff
+	au!
+    autocmd Filetype groff inoremap á \*[']a
+    autocmd Filetype groff inoremap Á \*[']A
+    autocmd Filetype groff inoremap é \*[']e
+    autocmd Filetype groff inoremap É \*[']E
+    autocmd Filetype groff inoremap í \*[']i
+    autocmd Filetype groff inoremap Í \*[']I
+    autocmd Filetype groff inoremap ó \*[']o
+    autocmd Filetype groff inoremap Ó \*[']O
+    autocmd Filetype groff inoremap ú \*[']u
+    autocmd Filetype groff inoremap Ú \*[']U
+    autocmd Filetype groff inoremap à \*[`]a
+    autocmd Filetype groff inoremap À \*[`]A
+    autocmd Filetype groff inoremap è \*[`]e
+    autocmd Filetype groff inoremap È \*[`]E
+    autocmd Filetype groff inoremap ì \*[`]i
+    autocmd Filetype groff inoremap Ì \*[`]I
+    autocmd Filetype groff inoremap ò \*[`]o
+    autocmd Filetype groff inoremap Ò \*[`]O
+    autocmd Filetype groff inoremap ù \*[`]u
+    autocmd Filetype groff inoremap Ù \*[`]U
+augroup END
 
 " }}}
 
-" }}}
