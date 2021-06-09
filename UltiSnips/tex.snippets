@@ -1,12 +1,10 @@
-snippet fig 
+snippet fig
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=.6\textwidth]{$1}
 	\caption{$2}
 	\label{fig:$3}
-\end{figure}
-
-$0
+\end{figure}$0
 endsnippet
 
 snippet fig2
@@ -24,25 +22,19 @@ snippet fig2
 		\caption{$5}
 		\label{fig:$6}
 	\end{minipage}
-\end{figure}
-
-$0
+\end{figure}$0
 endsnippet
 
 snippet be
 \begin{$1}
-	$2
+	$0
 \end{$1}
-
-$0
 endsnippet
 
 snippet eq
 \begin{equation}
-	$1
+	$0
 \end{equation}
-
-$0
 endsnippet
 
 snippet s
@@ -63,6 +55,65 @@ snippet sss
 $0
 endsnippet
 
+snippet ul
+\begin{itemize}
+	\item{$1}$0
+\end{itemize}
+endsnippet
+
+snippet nl
+\begin{enumerate}
+	\item{$1}$0
+\end{enumerate}
+endsnippet
+
 snippet i
-\item{$1}
+\item{$1}$0
+endsnippet
+
+snippet sfr
+\section{$1}
+\sectionframe
+
+$0
+endsnippet
+
+snippet ssfr
+\subsection{$1}
+\begin{frame}{$1}
+	$0
+\end{frame}
+endsnippet
+
+snippet fr
+\begin{frame}{$1}
+	$0
+\end{frame}
+endsnippet
+
+snippet cols
+\begin{columns}
+	$0
+\end{columns}
+endsnippet
+
+snippet col
+\column{.${1:5}\textwidth}
+	$0
+endsnippet
+
+snippet im
+\includegraphics[width=.${1:6}\textwidth]{$2}$0
+endsnippet
+
+snippet footcountremove
+\addtocounter{footnote}{-1}
+endsnippet
+
+snippet footcountadd
+\addtocounter{footnote}{1}
+endsnippet
+
+snippet ffct
+\footnotetext{\fullcite{$1}}$0
 endsnippet
