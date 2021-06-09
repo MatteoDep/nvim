@@ -14,4 +14,4 @@ nvim_lsp.pyls.setup{
 }
 nvim_lsp.ccls.setup{}
 nvim_lsp.bashls.setup{}
-
+nvim_lsp.texlab.setup{}

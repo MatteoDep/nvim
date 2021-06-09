@@ -97,6 +97,7 @@ set nohlsearch                    		" don't highlight search
 set incsearch			        		" incremental search
 set noerrorbells                		" disable sound error effects
 set conceallevel=2
+set spelllang=en_gb,it
 " }}}
 
 " theme {{{
@@ -150,7 +151,14 @@ augroup VimStartup
 	au VimEnter * if expand("%") == "" | Explore | endif
 augroup END
 " remove trailing spaces on save
-autocmd BufWrite * :%s/\s\+$//e
+augroup Format
+    au!
+    au BufWrite * :%s/\s\+$//e
+augroup END
+augroup Pass
+    au!
+    au BufRead,BufEnter */pass.*.txt set noswapfile
+augroup END
 " }}}
 
 " floaterm {{{
@@ -204,8 +212,9 @@ vnoremap <leader>y "+y
 noremap <leader>p "+p
 noremap <leader>P "+P
 " spell check
-map <F6> :setlocal spell spelllang=en_gb,it<CR>
-map <F7> :setlocal nospell<CR>
+map <F6> :setlocal spell!<CR>
+" compile
+noremap <silent> <leader>c :w \| :! compile %<CR>
 " }}}
 
 " easier exploration/substitution {{{
@@ -316,17 +325,6 @@ let g:UltiSnipsExpandTrigger="<c-j>"
 let g:UltiSnipsJumpForwardTrigger="<c-j>"
 let g:UltiSnipsJumpBackwardTrigger="<c-k>"
 
-" auto complete parentesis
-augroup AutoClose
-	au!
-	au FileType sh,python,cpp,c,vim,markdown,latex inoremap ( ()<Left>
-	au FileType sh,python,cpp,c,vim,markdown,latex inoremap [ []<Left>
-	au FileType sh,python,cpp,c,vim,markdown,latex inoremap { {}<Left>
-	au FileType sh,python,cpp,c,vim,markdown,latex inoremap ' ''<Left>
-	au FileType sh,python,cpp,c,markdown,latex inoremap " ""<Left>
-	au FileType vim inoremap < <><Left>
-augroup END
-
 " groff special characters shortcuts
 augroup Groff
 	au!
@@ -353,4 +351,3 @@ augroup Groff
 augroup END
 
 " }}}
-
