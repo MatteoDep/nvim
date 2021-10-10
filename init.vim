@@ -10,7 +10,6 @@
 call plug#begin('~/.config/nvim/plugged')
 
 " color scheme
-" Plug 'morhetz/gruvbox'
 Plug 'arcticicestudio/nord-vim'
 
 " status line
@@ -34,11 +33,8 @@ Plug 'tpope/vim-fugitive'
 " folds
 Plug 'tmhedberg/SimpylFold'
 
-" align text (before vim-markdown)
+" align text
 Plug 'godlygeek/tabular'
-
-" markdown
-Plug 'plasticboy/vim-markdown'
 
 " lsp
 Plug 'neovim/nvim-lspconfig'
@@ -65,6 +61,10 @@ Plug 'voldikss/vim-floaterm'
 
 " color previews
 Plug 'rrethy/vim-hexokinase', { 'do': 'make hexokinase' }
+
+" syntaxes
+Plug 'baskerville/vim-sxhkdrc'
+Plug 'cespare/vim-toml'
 
 call plug#end()
 
@@ -101,9 +101,6 @@ set spelllang=en_gb,it
 " }}}
 
 " theme {{{
-" let g:gruv_box_contrast_dark = 'hard'
-" let g:gruvbox_invert_selection = '0'
-" colorscheme gruvbox
 colorscheme nord
 set background=dark
 set termguicolors   " enable color previews
@@ -137,12 +134,21 @@ autocmd BufEnter,BufRead *rc set foldmethod=marker
 autocmd Filetype vim set foldmethod=marker
 " }}}
 
-" markdown {{{
-let g:vim_markdown_toc_autofit = 1
-let g:vim_markdown_frontmatter = 1
-let g:vim_markdown_math = 1
-let g:vim_markdown_strikethrough = 1
-let g:vim_markdown_new_list_item_indent = 0
+" floaterm {{{
+let g:floaterm_title  = "terminal"
+let g:floaterm_wintype  = "split"
+let g:floaterm_height = 0.8
+let g:floaterm_width  = 0.8
+" }}}
+
+" LSP {{{
+if expand("%:h:t") != "qutebrowser"
+    lua require('lsp_config')
+endif
+" }}}
+
+" fzf {{{
+let g:fzf_layout = { 'down': '50%' }
 " }}}
 
 " general autocmds {{{
@@ -159,21 +165,10 @@ augroup Pass
     au!
     au BufRead,BufEnter */pass.*.txt set noswapfile
 augroup END
-" }}}
-
-" floaterm {{{
-let g:floaterm_title  = "terminal"
-let g:floaterm_wintype  = "split"
-let g:floaterm_height = 0.8
-let g:floaterm_width  = 0.8
-" }}}
-
-" LSP {{{
-lua require('lsp_config')
-" }}}
-
-" fzf {{{
-let g:fzf_layout = { 'down': '50%' }
+augroup Sxhkd
+    au!
+    au BufWritePost */sxhkdrc !pkill -USR1 -x sxhkd
+augroup END
 " }}}
 
 " }}}
@@ -209,12 +204,20 @@ let mapleader = " "
 nnoremap <silent><leader>1 :source $MYVIMRC \| :PlugInstall<CR>
 " access system clipboard
 vnoremap <leader>y "+y
-noremap <leader>p "+p
-noremap <leader>P "+P
+nnoremap <leader>yy "+yy
+nnoremap <leader>yiw "+yiw
+nnoremap <leader>p "+p
+nnoremap <leader>P "+P
 " spell check
-map <F6> :setlocal spell!<CR>
+nnoremap <F6> :setlocal spell!<CR>
 " compile
-noremap <silent> <leader>c :w \| :! compile %<CR>
+nnoremap <silent> <leader>c :w \| :! compile %<CR>
+"folding
+nnoremap <silent> <CR> za
+nnoremap <silent> <Backspace> zc
+" hexokinase
+nnoremap <F4> :HexokinaseToggle<CR>
+
 " }}}
 
 " easier exploration/substitution {{{
@@ -261,10 +264,12 @@ tnoremap <A-Space> <C-\><C-n>
 " }}}
 
 " lsp {{{
+nnoremap <F7> :LspStart<CR>
+nnoremap <F8> :LspStop<CR>
 nnoremap <silent> gD <cmd>lua vim.lsp.buf.declaration()<CR>
 nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<CR>
 nnoremap <silent> K <cmd>lua vim.lsp.buf.hover()<CR>
-nnoremap <silent> <C-k> <cmd>lua vim.lsp.buf.signature_help()<CR>
+nnoremap <silent> gh <cmd>lua vim.lsp.buf.signature_help()<CR>
 nnoremap <silent> <leader>rn <cmd>lua vim.lsp.buf.rename()<CR>
 nnoremap <silent> gr <cmd>lua vim.lsp.buf.references()<CR>
 nnoremap <silent> [d <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
