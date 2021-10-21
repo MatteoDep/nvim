@@ -206,6 +206,7 @@ nnoremap <silent><leader>1 :source $MYVIMRC \| :PlugInstall<CR>
 vnoremap <leader>y "+y
 nnoremap <leader>yy "+yy
 nnoremap <leader>yiw "+yiw
+vnoremap <leader>p "+p
 nnoremap <leader>p "+p
 nnoremap <leader>P "+P
 " spell check
