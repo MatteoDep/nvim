@@ -2,9 +2,9 @@
 
 local nvim_lsp = require('lspconfig')
 
-nvim_lsp.pyls.setup{
+nvim_lsp.pylsp.setup{
     settings = {
-        pyls = {
+        pylsp = {
             plugins = {
                 pydocstyle = { enabled = true; }
             };

@@ -169,6 +169,10 @@ augroup Sxhkd
     au!
     au BufWritePost */sxhkdrc !pkill -USR1 -x sxhkd
 augroup END
+augroup Rofi
+    au!
+    au BufNewFile,BufRead /*.rasi setf css
+augroup END
 " }}}
 
 " }}}
