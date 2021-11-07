@@ -1,16 +1,16 @@
-" _   ___     _____ __  __                    __ _
+"  _   ___	   _____ __  __					   __ _
 " | \ | \ \   / /_ _|  \/  |   ___ ___  _ __  / _(_) __ _ ___
 " |  \| |\ \ / / | || |\/| |  / __/ _ \| '_ \| |_| |/ _` / __|
 " | |\  | \ V /  | || |  | | | (_| (_) | | | |  _| | (_| \__ \
 " |_| \_|  \_/  |___|_|  |_|  \___\___/|_| |_|_| |_|\__, |___/
-"                                                   |___/
+"												    |___/
 
 " PLUGINS {{{
 
 call plug#begin('~/.config/nvim/plugged')
 
-" color scheme
-Plug 'arcticicestudio/nord-vim'
+" syntax
+Plug 'sheerun/vim-polyglot'
 
 " status line
 Plug 'vim-airline/vim-airline'
@@ -54,17 +54,13 @@ Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 
 " debugging
-" Plug 'mfussenegger/nvim-dap'
+Plug 'mfussenegger/nvim-dap'
 
 " float terminal
 Plug 'voldikss/vim-floaterm'
 
 " color previews
 Plug 'rrethy/vim-hexokinase', { 'do': 'make hexokinase' }
-
-" syntaxes
-Plug 'baskerville/vim-sxhkdrc'
-Plug 'cespare/vim-toml'
 
 call plug#end()
 
@@ -82,32 +78,32 @@ call plug#end()
 
 " general {{{
 syntax enable							" Enables syntax highlighting
-filetype plugin on		        		" vim built-in plugins
+filetype plugin on						" vim built-in plugins
 set omnifunc=syntaxcomplete#Complete 	" default omni completion
 set shada+=n~/.config/nvim/main.shada	" change viminfo location
-set hidden 			            		" To keep multiple buffers open
-set nowrap			            		" wrap long lines
-set encoding=utf-8		        		" The encoding displayed
-set number relativenumber	    		" See line numbers and relative numbers
-set autoindent			        		" Automatically leave space at the left as the starting line
-set ruler			            		" Always display cursor
-set wildmenu                    		" command-line completion enhanced
+set hidden 								" To keep multiple buffers open
+set nowrap								" wrap long lines
+set encoding=utf-8						" The encoding displayed
+set number relativenumber				" See line numbers and relative numbers
+set autoindent							" Automatically leave space at the left as the starting line
+set ruler								" Always display cursor
+set wildmenu							" command-line completion enhanced
 set wildmode=longest,list,full			" Display all matching files when tab complete
-set nohlsearch                    		" don't highlight search
-set incsearch			        		" incremental search
-set noerrorbells                		" disable sound error effects
+set nohlsearch							" don't highlight search
+set incsearch							" incremental search
+set noerrorbells						" disable sound error effects
 set conceallevel=2
 set spelllang=en_gb,it
 " }}}
 
 " theme {{{
-colorscheme nord
-set background=dark
-set termguicolors   " enable color previews
+colorscheme chpal
+set termguicolors
 " airline
 let g:airline#extensions#tabline#enabled = 1
 let g:webdevicons_enable_airline_tabline = 1
 let g:webdevicons_enable_airline_statusline = 1
+let g:airline_theme='chpal'
 " hexokinase
 let g:Hexokinase_highlighters = ['backgroundfull']
 " }}}
@@ -143,7 +139,7 @@ let g:floaterm_width  = 0.8
 
 " LSP {{{
 if expand("%:h:t") != "qutebrowser"
-    lua require('lsp_config')
+	lua require('lsp_config')
 endif
 " }}}
 
@@ -158,20 +154,20 @@ augroup VimStartup
 augroup END
 " remove trailing spaces on save
 augroup Format
-    au!
-    au BufWrite * :%s/\s\+$//e
+	au!
+	au BufWrite * :%s/\s\+$//e
 augroup END
 augroup Pass
-    au!
-    au BufRead,BufEnter */pass.*.txt set noswapfile
+	au!
+	au BufRead,BufEnter */pass.*.txt set noswapfile
 augroup END
 augroup Sxhkd
-    au!
-    au BufWritePost */sxhkdrc !pkill -USR1 -x sxhkd
+	au!
+	au BufWritePost */sxhkdrc !pkill -USR1 -x sxhkd
 augroup END
 augroup Rofi
-    au!
-    au BufNewFile,BufRead /*.rasi setf css
+	au!
+	au BufNewFile,BufRead /*.rasi setf css
 augroup END
 " }}}
 
@@ -191,10 +187,10 @@ set completeopt=menuone,noinsert,noselect
 let g:completion_enable_snippet = 'UltiSnips'
 let g:completion_auto_change_source = 1
 let g:completion_chain_complete_list = [
-    \{'complete_items': ['lsp', 'snippet']},
-    \{ 'complete_items': ['buffers'] },
-    \{'mode': '<c-p>'},
-    \{'mode': '<c-n>'},
+	\{'complete_items': ['lsp', 'snippet']},
+	\{ 'complete_items': ['buffers'] },
+	\{'mode': '<c-p>'},
+	\{'mode': '<c-n>'},
 \]
 
 " }}}
@@ -261,7 +257,7 @@ nnoremap <C-q> :cclose<CR>
 " }}}
 
 " floaterm {{{
-let g:floaterm_keymap_new    = '<F9>'
+let g:floaterm_keymap_new	= '<F9>'
 let g:floaterm_keymap_prev   = '<F10>'
 let g:floaterm_keymap_next   = '<F11>'
 let g:floaterm_keymap_toggle = '<F12>'
@@ -338,26 +334,26 @@ let g:UltiSnipsJumpBackwardTrigger="<c-k>"
 " groff special characters shortcuts
 augroup Groff
 	au!
-    autocmd Filetype groff inoremap á \*[']a
-    autocmd Filetype groff inoremap Á \*[']A
-    autocmd Filetype groff inoremap é \*[']e
-    autocmd Filetype groff inoremap É \*[']E
-    autocmd Filetype groff inoremap í \*[']i
-    autocmd Filetype groff inoremap Í \*[']I
-    autocmd Filetype groff inoremap ó \*[']o
-    autocmd Filetype groff inoremap Ó \*[']O
-    autocmd Filetype groff inoremap ú \*[']u
-    autocmd Filetype groff inoremap Ú \*[']U
-    autocmd Filetype groff inoremap à \*[`]a
-    autocmd Filetype groff inoremap À \*[`]A
-    autocmd Filetype groff inoremap è \*[`]e
-    autocmd Filetype groff inoremap È \*[`]E
-    autocmd Filetype groff inoremap ì \*[`]i
-    autocmd Filetype groff inoremap Ì \*[`]I
-    autocmd Filetype groff inoremap ò \*[`]o
-    autocmd Filetype groff inoremap Ò \*[`]O
-    autocmd Filetype groff inoremap ù \*[`]u
-    autocmd Filetype groff inoremap Ù \*[`]U
+	autocmd Filetype groff inoremap á \*[']a
+	autocmd Filetype groff inoremap Á \*[']A
+	autocmd Filetype groff inoremap é \*[']e
+	autocmd Filetype groff inoremap É \*[']E
+	autocmd Filetype groff inoremap í \*[']i
+	autocmd Filetype groff inoremap Í \*[']I
+	autocmd Filetype groff inoremap ó \*[']o
+	autocmd Filetype groff inoremap Ó \*[']O
+	autocmd Filetype groff inoremap ú \*[']u
+	autocmd Filetype groff inoremap Ú \*[']U
+	autocmd Filetype groff inoremap à \*[`]a
+	autocmd Filetype groff inoremap À \*[`]A
+	autocmd Filetype groff inoremap è \*[`]e
+	autocmd Filetype groff inoremap È \*[`]E
+	autocmd Filetype groff inoremap ì \*[`]i
+	autocmd Filetype groff inoremap Ì \*[`]I
+	autocmd Filetype groff inoremap ò \*[`]o
+	autocmd Filetype groff inoremap Ò \*[`]O
+	autocmd Filetype groff inoremap ù \*[`]u
+	autocmd Filetype groff inoremap Ù \*[`]U
 augroup END
 
 " }}}
