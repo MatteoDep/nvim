@@ -97,13 +97,13 @@ set spelllang=en_gb,it
 " }}}
 
 " theme {{{
-colorscheme chpal
+colorscheme custom
 set termguicolors
 " airline
 let g:airline#extensions#tabline#enabled = 1
 let g:webdevicons_enable_airline_tabline = 1
 let g:webdevicons_enable_airline_statusline = 1
-let g:airline_theme='chpal'
+let g:airline_theme='custom'
 " hexokinase
 let g:Hexokinase_highlighters = ['backgroundfull']
 " }}}
