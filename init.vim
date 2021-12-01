@@ -9,9 +9,6 @@
 
 call plug#begin('~/.config/nvim/plugged')
 
-" syntax
-Plug 'sheerun/vim-polyglot'
-
 " status line
 Plug 'vim-airline/vim-airline'
 
@@ -95,6 +92,7 @@ set noerrorbells						" disable sound error effects
 set conceallevel=2
 set spelllang=en_gb,it
 set nrformats=bin,hex,alpha             " to use ctrl-a and ctrl-x
+set shell=/bin/sh
 " }}}
 
 " theme {{{
