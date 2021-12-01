@@ -94,6 +94,7 @@ set incsearch							" incremental search
 set noerrorbells						" disable sound error effects
 set conceallevel=2
 set spelllang=en_gb,it
+set nrformats=bin,hex,alpha             " to use ctrl-a and ctrl-x
 " }}}
 
 " theme {{{

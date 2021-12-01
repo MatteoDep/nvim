@@ -1,27 +1,27 @@
-" Base16 Gruvbox dark, hard vim-airline-theme (https://github.com/dawikur/base16-vim-airline-themes)
+" Base16 Nord vim-airline-theme (https://github.com/dawikur/base16-vim-airline-themes)
 " For vim-airline (https://github.com/vim-airline/vim-airline)
-" By Dawid Kurek (dawikur@gmail.com), morhetz (https://github.com/morhetz/gruvbox)
+" By arcticicestudio
 
 
 let g:airline#themes#custom#palette = {}
 
 " GUI color definitions
-let s:gui00 = '#1d2021'
-let s:gui01 = '#3c3836'
-let s:gui02 = '#504945'
-let s:gui03 = '#665c54'
-let s:gui04 = '#bdae93'
-let s:gui05 = '#d5c4a1'
-let s:gui06 = '#ebdbb2'
-let s:gui07 = '#fbf1c7'
-let s:gui08 = '#fb4934'
-let s:gui09 = '#fe8019'
-let s:gui0A = '#fabd2f'
-let s:gui0B = '#b8bb26'
-let s:gui0C = '#8ec07c'
-let s:gui0D = '#83a598'
-let s:gui0E = '#d3869b'
-let s:gui0F = '#d65d0e'
+let s:gui00 = '#2E3440'
+let s:gui01 = '#3B4252'
+let s:gui02 = '#434C5E'
+let s:gui03 = '#4C566A'
+let s:gui04 = '#D8DEE9'
+let s:gui05 = '#E5E9F0'
+let s:gui06 = '#ECEFF4'
+let s:gui07 = '#8FBCBB'
+let s:gui08 = '#BF616A'
+let s:gui09 = '#D08770'
+let s:gui0A = '#EBCB8B'
+let s:gui0B = '#A3BE8C'
+let s:gui0C = '#88C0D0'
+let s:gui0D = '#81A1C1'
+let s:gui0E = '#B48EAD'
+let s:gui0F = '#5E81AC'
 
 " Terminal color definitions
 let s:cterm00        = "00"
