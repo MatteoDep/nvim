@@ -92,7 +92,6 @@ set noerrorbells						" disable sound error effects
 set conceallevel=2
 set spelllang=en_gb,it
 set nrformats=bin,hex,alpha             " to use ctrl-a and ctrl-x
-set shell=/bin/sh
 " }}}
 
 " theme {{{
@@ -200,7 +199,7 @@ let mapleader = " "
 
 " general {{{
 " Source Vim configuration file and install plugins
-nnoremap <silent><leader>1 :source $MYVIMRC \| :PlugInstall<CR>
+nnoremap <silent><leader>1 :source ~/.config/nvim/init.vim<CR>
 " access system clipboard
 vnoremap <leader>y "+y
 nnoremap <leader>yy "+yy
