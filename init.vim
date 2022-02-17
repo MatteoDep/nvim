@@ -37,8 +37,12 @@ Plug 'godlygeek/tabular'
 Plug 'neovim/nvim-lspconfig'
 
 " complete
-Plug 'nvim-lua/completion-nvim'
-Plug 'steelsojka/completion-buffers'
+Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'hrsh7th/cmp-buffer'
+Plug 'hrsh7th/cmp-path'
+Plug 'hrsh7th/cmp-cmdline'
+Plug 'hrsh7th/nvim-cmp'
+Plug 'quangnguyen30192/cmp-nvim-ultisnips'
 
 " snippets tool
 Plug 'SirVer/ultisnips'
@@ -49,9 +53,6 @@ Plug 'mattn/emmet-vim'
 " fzf
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
-
-" debugging
-Plug 'mfussenegger/nvim-dap'
 
 " float terminal
 Plug 'voldikss/vim-floaterm'
@@ -76,7 +77,6 @@ call plug#end()
 " general {{{
 syntax enable							" Enables syntax highlighting
 filetype plugin on						" vim built-in plugins
-set omnifunc=syntaxcomplete#Complete 	" default omni completion
 set shada+=n~/.config/nvim/main.shada	" change viminfo location
 set hidden 								" To keep multiple buffers open
 set nowrap								" wrap long lines
@@ -118,10 +118,6 @@ let g:loaded_python_provider = 0
 let g:python3_host_prog = '~/.config/nvim/nvim-pyenv/bin/python'
 " }}}
 
-" debugging {{{
-" lua require('dap_config')
-" }}}
-
 " folding {{{
 set foldmethod=syntax
 autocmd BufEnter,BufRead *rc set foldmethod=marker
@@ -135,10 +131,9 @@ let g:floaterm_height = 0.8
 let g:floaterm_width  = 0.8
 " }}}
 
-" LSP {{{
-if expand("%:h:t") != "qutebrowser"
-	lua require('lsp_config')
-endif
+" lua: autocomplete and lsp {{{
+set completeopt=menu,menuone,noselect
+lua require('init')
 " }}}
 
 " fzf {{{
@@ -167,29 +162,11 @@ augroup Rofi
 	au!
 	au BufNewFile,BufRead /*.rasi setf css
 augroup END
+augroup Nolsp
+  au!
+  au BufRead,BufNewFile,BufEnter *qutebrowser/config.py LspStop
+augroup END
 " }}}
-
-" }}}
-
-" AUTOCOMPLETE {{{
-
-" Use completion-nvim in every buffer
-autocmd BufEnter * lua require'completion'.on_attach()
-" add fuzzy completion
-let g:completion_matching_strategy_list = ['exact', 'substring', 'fuzzy']
-" Avoid showing message extra message when using completion
-set shortmess+=c
-set completeopt=menuone,noinsert,noselect
-
-" sources
-let g:completion_enable_snippet = 'UltiSnips'
-let g:completion_auto_change_source = 1
-let g:completion_chain_complete_list = [
-	\{'complete_items': ['lsp', 'snippet']},
-	\{ 'complete_items': ['buffers'] },
-	\{'mode': '<c-p>'},
-	\{'mode': '<c-n>'},
-\]
 
 " }}}
 
@@ -277,15 +254,6 @@ nnoremap <silent> <space>f <cmd>lua vim.lsp.buf.formatting()<CR>
 vnoremap <silent> <space>f <cmd>lua vim.lsp.buf.range_formatting()<CR>
 " }}}
 
-" completion {{{
-inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-imap <tab> <Plug>(completion_smart_tab)
-" Insert mode completion of paths with fzf
-inoremap <expr> <A-i> fzf#vim#complete#path('fd')
-inoremap <expr> /<A-i> fzf#vim#complete#path('locate /')
-" }}}
-
 " tabular {{{
 nmap <leader>a= :Tabularize /=<CR>
 vmap <leader>a= :Tabularize /=<CR>
@@ -293,18 +261,6 @@ nmap <leader>a: :Tabularize /:\zs<CR>
 vmap <leader>a: :Tabularize /:\zs<CR>
 nmap <leader>a, :Tabularize /,\zs<CR>
 vmap <leader>a, :Tabularize /,\zs<CR>
-" }}}
-
-" debugging {{{
-nnoremap <silent> <leader>dc :lua require'dap'.continue()<CR>
-nnoremap <silent> <leader>dj :lua require'dap'.step_over()<CR>
-nnoremap <silent> <leader>dl :lua require'dap'.step_into()<CR>
-nnoremap <silent> <leader>dh :lua require'dap'.step_out()<CR>
-nnoremap <silent> <leader>dt :lua require'dap'.toggle_breakpoint()<CR>
-nnoremap <silent> <leader>ds :lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>
-nnoremap <silent> <leader>dsl :lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>
-nnoremap <silent> <leader>dr :lua require'dap'.repl.open()<CR>
-nnoremap <silent> <leader>drl :lua require'dap'.repl.run_last()<CR>
 " }}}
 
 " git {{{
