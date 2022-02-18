@@ -44,29 +44,29 @@ cmp.setup.cmdline(':', {
     { name = 'cmdline' }
   }
 })
+cmp.setup.cmdline('?', {
+  sources = {
+    { name = 'buffer' },
+  }
+})
 cmp.setup.cmdline('/', {
   sources = {
     { name = 'buffer' },
   }
 })
 
+-- folding
+function on_attach_callback(client, bufnr)
+  require('folding').on_attach()
+end
+
 -- Setup lspconfig.
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 local lspconfig = require('lspconfig')
-local servers = { 'clangd', 'bashls', 'texlab' }
+local servers = { 'clangd', 'pylsp', 'bashls', 'texlab' }
 for _, lsp in ipairs(servers) do
     lspconfig[lsp].setup {
       capabilities = capabilities,
+      on_attach = on_attach_callback,
     }
 end
-lspconfig['pylsp'].setup{
-    capabilities = capabilities,
-    settings = {
-        pylsp = {
-            plugins = {
-                pydocstyle = { enabled = true; }
-            };
-            configurationSources = { "flake8" };
-        };
-    };
-}
