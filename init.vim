@@ -50,11 +50,16 @@ call plug#end()
 
 " }}}
 
+" LUA SETTINGS {{{
+lua require('init')
+" }}}
+
 " GENERAL CONFIGS {{{
 
-                                      " general {{{
+" general {{{
 syntax enable                         " Enables syntax highlighting
 filetype plugin on                    " vim built-in plugins
+set completeopt=menu,menuone,noselect " completion style
 set shada+=n~/.config/nvim/main.shada " change viminfo location
 set hidden                            " To keep multiple buffers open
 set nowrap                            " wrap long lines
@@ -109,11 +114,6 @@ let g:floaterm_height = 0.8
 let g:floaterm_width  = 0.8
 " }}}
 
-" lua: autocomplete and lsp {{{
-set completeopt=menu,menuone,noselect
-lua require('init')
-" }}}
-
 " fzf {{{
 let g:fzf_layout = { 'down': '50%' }
 " }}}
@@ -150,11 +150,16 @@ augroup END
 
 " KEY BINDINGS {{{
 
+" definitions
 let mapleader = " "
+function RunInFloaterm(text)
+    FloatermToggle
+    execute "!xdotool type '".a:text."'\<CR>"
+endfunction
 
 " general {{{
 " Source Vim configuration file and install plugins
-nnoremap <leader>1 :source ~/.config/nvim/init.vim<CR>
+nnoremap <leader>1 :w \| :source ~/.config/nvim/init.vim<CR>
 " access system clipboard
 vnoremap <leader>y "+y
 nnoremap <leader>yy "+yy
@@ -165,7 +170,7 @@ nnoremap <leader>P "+P
 " spell check
 nnoremap <F6> :setlocal spell!<CR>
 " compile
-nnoremap <silent> <leader>c :w \| :! compile %<CR>
+nnoremap <silent> <leader>c :w \| call RunInFloaterm('compile '.expand('%'))<CR>
 "folding
 nnoremap <silent> <CR> za
 nnoremap <silent> <Backspace> zc

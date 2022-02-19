@@ -63,7 +63,7 @@ end
 -- Setup lspconfig.
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 local lspconfig = require('lspconfig')
-local servers = { 'clangd', 'pylsp', 'bashls', 'texlab' }
+local servers = { 'clangd', 'pylsp', 'bashls', 'texlab', 'vimls' }
 for _, lsp in ipairs(servers) do
     lspconfig[lsp].setup {
       capabilities = capabilities,
