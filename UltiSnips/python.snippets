@@ -14,14 +14,18 @@ def print_doc(snip, text):
 endglobal
 
 
-snippet #!
+snippet #! "sheebang" b
 #!/usr/bin/env python
 endsnippet
 
 
-snippet new
+snippet new "module docstring" b
 # -*- coding: utf-8 -*-
 """${1:`!v expand("%:r:t")`}.
+
+Created on ${2:`date +%d.%m.%Y`}
+Author: ${3:Matteo De Pellegrin}
+Email: ${4:matteo.dep97@gmail.com}
 
 ${2:${VISUAL}}
 """
@@ -31,23 +35,7 @@ $0
 endsnippet
 
 
-snippet adi-new
-# -*- coding: utf-8 -*-
-"""${1:`!v expand("%:r:t")`}.
-
-Created on Monday ${2:`date +%d.%m.%Y`}
-Copyright (©) Lucien M. Fesselet
-Author: ${3:Matteo De Pellegrin}
-Email: ${4:matteo.dep97@gmail.com}
-
-${5:${VISUAL}}
-"""
-
-
-$0
-endsnippet
-
-snippet main
+snippet main "main guard" b
 if __name__ == "__main__":
 	$0
 endsnippet
