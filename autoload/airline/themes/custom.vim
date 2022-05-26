@@ -1,27 +1,27 @@
-" Base16 Solarized Dark vim-airline-theme (https://github.com/dawikur/base16-vim-airline-themes)
+" Base16 Nord vim-airline-theme (https://github.com/dawikur/base16-vim-airline-themes)
 " For vim-airline (https://github.com/vim-airline/vim-airline)
-" By Ethan Schoonover (modified by aramisgithub)
+" By arcticicestudio
 
 
 let g:airline#themes#custom#palette = {}
 
 " GUI color definitions
-let s:gui00 = '#002b36'
-let s:gui01 = '#073642'
-let s:gui02 = '#586e75'
-let s:gui03 = '#657b83'
-let s:gui04 = '#839496'
-let s:gui05 = '#93a1a1'
-let s:gui06 = '#eee8d5'
-let s:gui07 = '#fdf6e3'
-let s:gui08 = '#dc322f'
-let s:gui09 = '#cb4b16'
-let s:gui0A = '#b58900'
-let s:gui0B = '#859900'
-let s:gui0C = '#2aa198'
-let s:gui0D = '#268bd2'
-let s:gui0E = '#6c71c4'
-let s:gui0F = '#d33682'
+let s:gui00 = '#2E3440'
+let s:gui01 = '#3B4252'
+let s:gui02 = '#434C5E'
+let s:gui03 = '#4C566A'
+let s:gui04 = '#D8DEE9'
+let s:gui05 = '#E5E9F0'
+let s:gui06 = '#ECEFF4'
+let s:gui07 = '#8FBCBB'
+let s:gui08 = '#BF616A'
+let s:gui09 = '#D08770'
+let s:gui0A = '#EBCB8B'
+let s:gui0B = '#A3BE8C'
+let s:gui0C = '#88C0D0'
+let s:gui0D = '#81A1C1'
+let s:gui0E = '#B48EAD'
+let s:gui0F = '#5E81AC'
 
 " Terminal color definitions
 let s:cterm00        = "00"

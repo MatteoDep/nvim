@@ -70,6 +70,8 @@ set nrformats=bin,hex,alpha           " to use ctrl-a and ctrl-x
 " theme
 colorscheme custom
 set termguicolors
+" transparent background
+hi Normal guibg=NONE ctermbg=NONE
 " airline
 let g:airline#extensions#tabline#enabled = 1
 let g:webdevicons_enable_airline_tabline = 1
@@ -132,8 +134,8 @@ function RunInFloaterm(text)
     execute "!xdotool type '".a:text."'\<CR>"
 endfunction
 
-" Source Vim configuration file and install plugins
-nnoremap <leader>1 :w \| :source ~/.config/nvim/init.vim<CR>
+nnoremap <leader>1 :LspStop \| :set all& \| :source ~/.config/nvim/init.vim<CR>
+nnoremap <leader>2 :colorscheme custom \| :AirlineTheme custom<CR>
 " access system clipboard
 vnoremap <leader>y "+y
 nnoremap <leader>yy "+yy
@@ -146,8 +148,8 @@ nnoremap <F6> :setlocal spell!<CR>
 " compile
 nnoremap <silent> <leader>c :w \| call RunInFloaterm('compile '.expand('%'))<CR>
 "folding
-nnoremap <silent> <CR> za
-nnoremap <silent> <Backspace> zc
+nnoremap <silent> <Space><Space> za
+nnoremap <silent> <Space><CR> zA
 " hexokinase
 nnoremap <F4> :HexokinaseToggle<CR>
 
