@@ -61,15 +61,13 @@ cmp.setup {
       else
         fallback() -- The fallback function sends a already mapped key. In this case, it's probably `<Tab>`.
       end
-    end, { "i", "s" }),
+    end, { "c", "i", "s" }),
 
     ["<S-Tab>"] = cmp.mapping(function()
       if cmp.visible() then
         cmp.select_prev_item()
-      elseif vim.fn["vsnip#jumpable"](-1) == 1 then
-        feedkey("<Plug>(vsnip-jump-prev)", "")
       end
-    end, { "i", "s" }),
+    end, { "c", "i", "s" }),
   },
   sources = {
     { name = 'nvim_lsp' },
