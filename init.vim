@@ -67,6 +67,8 @@ set noerrorbells                      " disable sound error effects
 set conceallevel=2
 set spelllang=en_gb,it
 set nrformats=bin,hex,alpha           " to use ctrl-a and ctrl-x
+set formatoptions=tcrvqlj
+set foldlevel=100
 " theme
 colorscheme custom
 set termguicolors
@@ -161,16 +163,16 @@ nnoremap <A-g> :GFiles<CR>
 nnoremap <A-l> :Lines<CR>
 nnoremap <A-b> :Buffers<CR>
 vnoremap gR y:Rg <C-r>=escape(@",'/\')<CR><CR>
-nnoremap gR yiw:Rg <C-r>=escape(@",'/\')<CR><CR>
+nnoremap gR yiw:Rg <C-r>"<CR>
 " search text in buffer
-vnoremap <leader>l y:BLines <C-R>=escape(@",'/\')<CR><CR>
-nnoremap <leader>l yiw:BLines <C-R>=escape(@",'/\')<CR><CR>
+vnoremap <leader>l y:Lines <C-R>=escape(@",'/\')<CR><CR>
+nnoremap <leader>l yiw:Lines <C-R>"<CR>
 " substitute text in buffer
 vnoremap <leader>s y:%s/\V<C-R>=escape(@",'/\')<CR>//gc<Left><Left><Left>
 nnoremap <leader>s yiw:%s/\<<C-R>"\>//gc<Left><Left><Left>
 
 " navigate through buffers
-nnoremap <Tab> :bnext<CR>
+nnoremap <A-Tab> :bnext<CR>
 nnoremap <S-Tab> :bprev<CR>
 nnoremap ZX :bdel<CR>
 

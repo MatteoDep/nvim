@@ -1,27 +1,27 @@
-" Base16 Horizon Dark vim-airline-theme (https://github.com/dawikur/base16-vim-airline-themes)
+" Base16 Dracula vim-airline-theme (https://github.com/dawikur/base16-vim-airline-themes)
 " For vim-airline (https://github.com/vim-airline/vim-airline)
-" By Michaël Ball (http://github.com/michael-ball/)
+" By Mike Barkmin (http://github.com/mikebarkmin) based on Dracula Theme (http://github.com/dracula)
 
 
 let g:airline#themes#custom#palette = {}
 
 " GUI color definitions
-let s:gui00 = '#1C1E26'
-let s:gui01 = '#232530'
-let s:gui02 = '#2E303E'
-let s:gui03 = '#6F6F70'
-let s:gui04 = '#9DA0A2'
-let s:gui05 = '#CBCED0'
-let s:gui06 = '#DCDFE4'
-let s:gui07 = '#E3E6EE'
-let s:gui08 = '#E93C58'
-let s:gui09 = '#E58D7D'
-let s:gui0A = '#EFB993'
-let s:gui0B = '#EFAF8E'
-let s:gui0C = '#24A8B4'
-let s:gui0D = '#DF5273'
-let s:gui0E = '#B072D1'
-let s:gui0F = '#E4A382'
+let s:gui00 = '#282936'
+let s:gui01 = '#3a3c4e'
+let s:gui02 = '#4d4f68'
+let s:gui03 = '#626483'
+let s:gui04 = '#62d6e8'
+let s:gui05 = '#e9e9f4'
+let s:gui06 = '#f1f2f8'
+let s:gui07 = '#f7f7fb'
+let s:gui08 = '#ea51b2'
+let s:gui09 = '#b45bcf'
+let s:gui0A = '#00f769'
+let s:gui0B = '#ebff87'
+let s:gui0C = '#a1efe4'
+let s:gui0D = '#62d6e8'
+let s:gui0E = '#b45bcf'
+let s:gui0F = '#00f769'
 
 " Terminal color definitions
 let s:cterm00        = "00"
