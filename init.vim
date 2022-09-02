@@ -1,46 +1,46 @@
-"  _   ___       _____ __  __                       __ _
+"  _   ___	   _____ __  __					   __ _
 " | \ | \ \   / /_ _|  \/  |   ___ ___  _ __  / _(_) __ _ ___
 " |  \| |\ \ / / | || |\/| |  / __/ _ \| '_ \| |_| |/ _` / __|
 " | |\  | \ V /  | || |  | | | (_| (_) | | | |  _| | (_| \__ \
 " |_| \_|  \_/  |___|_|  |_|  \___\___/|_| |_|_| |_|\__, |___/
-"                                                    |___/
+"													|___/
 
 " PLUGINS
 call plug#begin('~/.config/nvim/plugged')
-    " status line
-    Plug 'vim-airline/vim-airline'
-    " icons
-    Plug 'ryanoasis/vim-devicons'
-    " handle what surrounds a text object
-    Plug 'tpope/vim-surround'
-    " handle comments
-    Plug 'tpope/vim-commentary'
-    " extend repeat (.) abilities
-    Plug 'tpope/vim-repeat'
-    " git in vim!
-    Plug 'tpope/vim-fugitive'
-        " folds
-    Plug 'vitaly/folding-nvim'
-    " align text
-    Plug 'godlygeek/tabular'
-    " lsp
-    Plug 'neovim/nvim-lspconfig'
-    " complete
-    Plug 'hrsh7th/cmp-nvim-lsp'
-    Plug 'hrsh7th/cmp-buffer'
-    Plug 'hrsh7th/cmp-path'
-    Plug 'hrsh7th/cmp-cmdline'
-    Plug 'hrsh7th/nvim-cmp'
-    Plug 'quangnguyen30192/cmp-nvim-ultisnips'
-    " snippets tool
-    Plug 'SirVer/ultisnips'
-    " fzf
-    Plug 'junegunn/fzf'
-    Plug 'junegunn/fzf.vim'
-    " float terminal
-    Plug 'voldikss/vim-floaterm'
-    " color previews
-    Plug 'rrethy/vim-hexokinase', { 'do': 'make hexokinase' }
+	" status line
+	Plug 'vim-airline/vim-airline'
+	" icons
+	Plug 'ryanoasis/vim-devicons'
+	" handle what surrounds a text object
+	Plug 'tpope/vim-surround'
+	" handle comments
+	Plug 'tpope/vim-commentary'
+	" extend repeat (.) abilities
+	Plug 'tpope/vim-repeat'
+	" git in vim!
+	Plug 'tpope/vim-fugitive'
+		" folds
+	Plug 'vitaly/folding-nvim'
+	" align text
+	Plug 'godlygeek/tabular'
+	" lsp
+	Plug 'neovim/nvim-lspconfig'
+	" complete
+	Plug 'hrsh7th/cmp-nvim-lsp'
+	Plug 'hrsh7th/cmp-buffer'
+	Plug 'hrsh7th/cmp-path'
+	Plug 'hrsh7th/cmp-cmdline'
+	Plug 'hrsh7th/nvim-cmp'
+	Plug 'quangnguyen30192/cmp-nvim-ultisnips'
+	" snippets tool
+	Plug 'SirVer/ultisnips'
+	" fzf
+	Plug 'junegunn/fzf'
+	Plug 'junegunn/fzf.vim'
+	" float terminal
+	Plug 'voldikss/vim-floaterm'
+	" color previews
+	Plug 'rrethy/vim-hexokinase', { 'do': 'make hexokinase' }
 call plug#end()
 
 " LUA SETTINGS
@@ -49,24 +49,24 @@ lua require('init')
 " GENERAL CONFIGS
 
 " general
-syntax enable                         " Enables syntax highlighting
-filetype plugin on                    " vim built-in plugins
+syntax enable						 " Enables syntax highlighting
+filetype plugin on					" vim built-in plugins
 set completeopt=menu,menuone,noselect " completion style
 set shada+=n~/.config/nvim/main.shada " change viminfo location
-set hidden                            " To keep multiple buffers open
-set nowrap                            " wrap long lines
-set encoding=utf-8                    " The encoding displayed
-set number relativenumber             " See line numbers and relative numbers
-set autoindent                        " Automatically leave space at the left as the starting line
-set ruler                             " Always display cursor
-set wildmenu                          " command-line completion enhanced
-set wildmode=longest,list,full        " Display all matching files when tab complete
-set nohlsearch                        " don't highlight search
-set incsearch                         " incremental search
-set noerrorbells                      " disable sound error effects
+set hidden							" To keep multiple buffers open
+set nowrap							" wrap long lines
+set encoding=utf-8					" The encoding displayed
+set number relativenumber			 " See line numbers and relative numbers
+set autoindent						" Automatically leave space at the left as the starting line
+set ruler							 " Always display cursor
+set wildmenu						  " command-line completion enhanced
+set wildmode=longest,list,full		" Display all matching files when tab complete
+set nohlsearch						" don't highlight search
+set incsearch						 " incremental search
+set noerrorbells					  " disable sound error effects
 set conceallevel=2
 set spelllang=en_gb,it
-set nrformats=bin,hex,alpha           " to use ctrl-a and ctrl-x
+set nrformats=bin,hex,alpha		   " to use ctrl-a and ctrl-x
 set formatoptions=tcrvqlj
 set foldlevel=100
 " theme
@@ -85,7 +85,7 @@ let g:Hexokinase_highlighters = ['backgroundfull']
 set tabstop=4
 set shiftwidth=4
 set softtabstop=4
-set expandtab
+set noexpandtab
 " python support
 let g:loaded_python_provider = 0
 let g:python3_host_prog = '~/.config/nvim/nvim-pyenv/bin/python'
@@ -103,37 +103,40 @@ let g:fzf_layout = { 'down': '50%' }
 
 " general autocmds
 augroup VimStartup
-    au!
-    au VimEnter * if expand("%") == "" | Explore | endif
+	au!
+	au VimEnter * if expand("%") == "" | Explore | endif
 augroup END
 augroup Format
-    au!
-    au BufWrite * :%s/\s\+$//e
+	au!
+	au BufWrite * :%s/\s\+$//e
 augroup END
 augroup Pass
-    au!
-    au BufRead,BufEnter */pass.*.txt set noswapfile
+	au!
+	au BufRead,BufEnter */pass.*.txt set noswapfile
 augroup END
 augroup Sxhkd
-    au!
-    au BufWritePost */sxhkdrc !pkill -USR1 -x sxhkd
+	au!
+	au BufWritePost */sxhkdrc !pkill -USR1 -x sxhkd
 augroup END
 augroup Rofi
-    au!
-    au BufNewFile,BufRead /*.rasi setf css
+	au!
+	au BufNewFile,BufRead /*.rasi setfiletype css
 augroup END
 augroup Nolsp
-    au!
-    au BufRead,BufNewFile,BufEnter *qutebrowser/config.py LspStop
+	au!
+	au BufRead,BufNewFile,BufEnter *qutebrowser/config.py LspStop
 augroup END
+augroup FiletypeDetection
+	au!
+	au BufRead,BufNewFile,BufEnter *.tex setfiletype tex
 
 " KEY BINDINGS
 
 " definitions
 let mapleader = " "
 function RunInFloaterm(text)
-    FloatermToggle
-    execute "!xdotool type '".a:text."'\<CR>"
+	FloatermToggle
+	execute "!xdotool type '".a:text."'\<CR>"
 endfunction
 
 nnoremap <leader>1 :LspStop \| :set all& \| :source ~/.config/nvim/init.vim<CR>
@@ -188,7 +191,7 @@ nnoremap <C-p> :cprev<CR>
 nnoremap <C-q> :cclose<CR>
 
 " floaterm
-let g:floaterm_keymap_new    = '<F9>'
+let g:floaterm_keymap_new	= '<F9>'
 let g:floaterm_keymap_prev   = '<F10>'
 let g:floaterm_keymap_next   = '<F11>'
 let g:floaterm_keymap_toggle = '<F12>'
