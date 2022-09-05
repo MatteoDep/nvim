@@ -202,3 +202,12 @@ keymap("t", "<A-space>", "<C-\\><C-n>", opts)
 keymap('t', "<A-n>", "<C-\\><C-n><cmd>FloatermNew<CR>", opts)
 keymap('t', "<A-Tab>", "<C-\\><C-n><cmd>FloatermNext<CR>", opts)
 keymap('t', "<S-Tab>", "<C-\\><C-n><cmd>FloatermPrev<CR>", opts)
+
+-- colorscheme
+RefreshColorscheme = function ()
+  vim.cmd("colorscheme custom")
+  vim.cmd("AirlineTheme custom")
+end
+vim.api.nvim_create_autocmd({ "Signal SIGUSR1" }, {
+  command = "lua RefreshColorscheme()",
+})
