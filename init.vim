@@ -188,13 +188,6 @@ vmap <leader>a, :Tabularize /,\zs<CR>
 nmap <leader>aa :Tabularize /
 vmap <leader>aa :Tabularize /
 
-" git
-nnoremap <leader>gg :G<Space>
-nnoremap <leader>gs :G<CR>4j
-nnoremap <leader>gp :G push<CR>
-nnoremap <leader>gh :diffget //2<CR>
-nnoremap <leader>gl :diffget //3<CR>
-
 " ultisnips
 let g:UltiSnipsExpandTrigger="<c-j>"
 let g:UltiSnipsJumpForwardTrigger="<c-j>"
