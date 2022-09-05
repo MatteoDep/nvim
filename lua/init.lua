@@ -188,7 +188,7 @@ end
 -- floaterm
 -- bg jobs
 vim.g.floaterm_opener = 'edit'
-keymap('n', "<A-c>", "<cmd>FloatermSend compile %<CR>", opts)
+keymap('n', "<A-c>", "<cmd>w<CR><cmd>FloatermSend compile %<CR>", opts)
 
 -- commands
 keymap('n', "<A-e>", "<cmd>FloatermNew ranger --cmd='set preview_images=false'<CR>", opts)
@@ -203,10 +203,16 @@ keymap('t', "<A-n>", "<C-\\><C-n><cmd>FloatermNew<CR>", opts)
 keymap('t', "<A-Tab>", "<C-\\><C-n><cmd>FloatermNext<CR>", opts)
 keymap('t', "<S-Tab>", "<C-\\><C-n><cmd>FloatermPrev<CR>", opts)
 
--- colorscheme
+-- theming
+vim.cmd("colorscheme custom")
+vim.api.nvim_set_option('termguicolors', true)
+vim.cmd("hi Normal guibg=NONE ctermbg=NONE")
+vim.g.webdevicons_enable_airline_statusline = 1
+vim.g.airline_theme='custom'
 RefreshColorscheme = function ()
   vim.cmd("colorscheme custom")
   vim.cmd("AirlineTheme custom")
+  vim.cmd("hi Normal guibg=NONE ctermbg=NONE")
 end
 vim.api.nvim_create_autocmd({ "Signal SIGUSR1" }, {
   command = "lua RefreshColorscheme()",
