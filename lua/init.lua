@@ -37,32 +37,33 @@ end
 -- Setup nvim-cmp.
 -- local cmp_ultisnips_mappings = require("cmp_nvim_ultisnips.mappings")
 local cmp = require('cmp')
-cmp.setup {
-  snippet = {
-    expand = function(args)
-        vim.fn["UltiSnips#Anon"](args.body)
-    end,
-  },
-  mapping = {
-    ['<C-p>'] = cmp.mapping.select_prev_item(),
-    ['<C-n>'] = cmp.mapping.select_next_item(),
-    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete(),
-    ['<C-e>'] = cmp.mapping.close(),
-    ['<CR>'] = cmp.mapping.confirm {
-      behavior = cmp.ConfirmBehavior.Replace,
-      select = false,
+if cmp then
+  cmp.setup {
+    snippet = {
+      expand = function(args)
+          vim.fn["UltiSnips#Anon"](args.body)
+      end,
     },
-    ["<Tab>"] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
-      elseif has_words_before() then
-        cmp.complete()
-      else
-        fallback() -- The fallback function sends a already mapped key. In this case, it's probably `<Tab>`.
-      end
-    end, { "c", "i", "s" }),
+    mapping = {
+      ['<C-p>'] = cmp.mapping.select_prev_item(),
+      ['<C-n>'] = cmp.mapping.select_next_item(),
+      ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+      ['<C-f>'] = cmp.mapping.scroll_docs(4),
+      ['<C-Space>'] = cmp.mapping.complete(),
+      ['<C-e>'] = cmp.mapping.close(),
+      ['<CR>'] = cmp.mapping.confirm {
+        behavior = cmp.ConfirmBehavior.Replace,
+        select = false,
+      },
+      ["<Tab>"] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_next_item()
+        elseif has_words_before() then
+          cmp.complete()
+        else
+          fallback() -- The fallback function sends a already mapped key. In this case, it's probably `<Tab>`.
+        end
+      end, { "c", "i", "s" }),
 
     ["<S-Tab>"] = cmp.mapping(function()
       if cmp.visible() then
@@ -78,27 +79,28 @@ cmp.setup {
   },
 }
 
--- Set configuration for specific cases.
-cmp.setup.filetype('gitcommit', {
-  sources = cmp.config.sources({
-    { name = 'buffer' },
+  -- Set configuration for specific cases.
+  cmp.setup.filetype('gitcommit', {
+    sources = cmp.config.sources({
+      { name = 'buffer' },
+    })
   })
-})
-cmp.setup.cmdline(':', {
-  sources = {
-    { name = 'cmdline' }
-  }
-})
-cmp.setup.cmdline('?', {
-  sources = {
-    { name = 'buffer' },
-  }
-})
-cmp.setup.cmdline('/', {
-  sources = {
-    { name = 'buffer' },
-  }
-})
+  cmp.setup.cmdline(':', {
+    sources = {
+      { name = 'cmdline' }
+    }
+  })
+  cmp.setup.cmdline('?', {
+    sources = {
+      { name = 'buffer' },
+    }
+  })
+  cmp.setup.cmdline('/', {
+    sources = {
+      { name = 'buffer' },
+    }
+  })
+end
 
 -- Setup lspconfig.
 local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -157,9 +159,13 @@ require'nvim-treesitter.configs'.setup {
     max_file_lines = nil, -- Do not enable for files with more than n lines, int
   }
 }
+vim.api.nvim_create_autocmd({ "InsertLeave" }, {
+  command = "norm zx",
+})
 
 -- harpoon
 Startup = function ()
+  vim.cmd("FloatermNew --silent")
   if vim.fn.expand('%') == '' then
     vim.cmd("lua require('harpoon.ui').toggle_quick_menu()")
   end
@@ -173,6 +179,7 @@ vim.api.nvim_create_autocmd({ "BufWrite" }, {
 keymap('n', "<A-Tab>", "<cmd>lua require('harpoon.ui').nav_next()<CR>", opts)
 keymap('n', "<S-Tab>", "<cmd>lua require('harpoon.ui').nav_prev()<CR>", opts)
 keymap('n', "<A-h>", "<cmd>lua require('harpoon.ui').toggle_quick_menu()<CR>", opts)
+keymap('n', "<A-n>", "<cmd>lua require('harpoon.mark').add_file()<CR>", opts)
 for i = 1,9,1 do
   local si = string.format('%d', i)
   keymap('n', "<A-"..si..">", "<cmd>lua require('harpoon.ui').nav_file("..si..")<CR>", opts)
@@ -181,19 +188,11 @@ end
 -- floaterm
 -- bg jobs
 vim.g.floaterm_opener = 'edit'
-SendjobToFloatermBG = function (command)
-  vim.cmd("FloatermToggle --name=bg")
-  vim.cmd("FloatermHide --name=bg")
-  vim.cmd("FloatermSend --name=bg "..command)
-  vim.cmd("stopinsert") -- why is this needed?
-end
-keymap('n', "<A-c>", "<cmd>lua SendjobToFloatermBG('compile %')<CR>", opts)
-keymap('n', "<A-b>", "<cmd>FloatermToggle --name=bg<CR>", opts)
-keymap("t", "<A-b>", "<C-\\><C-n><cmd>FloatermToggle --name=bg<CR>", opts)
+keymap('n', "<A-c>", "<cmd>FloatermSend compile %<CR>", opts)
 
 -- commands
-keymap('n', "<A-e>", "<cmd>FloatermNew ranger<CR>", opts)
-keymap('n', "<A-f>", "<cmd>FloatermNew fzf<CR>", opts)
+keymap('n', "<A-e>", "<cmd>FloatermNew ranger --cmd='set preview_images=false'<CR>", opts)
+keymap('n', "<A-f>", "<cmd>FloatermNew fzf -m<CR>", opts)
 keymap('n', "<A-g>", "<cmd>FloatermNew lazygit<CR>", opts)
 
 -- interactive
