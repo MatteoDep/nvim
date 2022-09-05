@@ -10,7 +10,7 @@ keymap('n', '<space>q', '<cmd>lua vim.diagnostic.setloclist()<CR>', opts)
 
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
-local on_attach = function(client, bufnr)
+local on_attach = function(_, bufnr)
   -- Mappings.
   -- See `:help vim.lsp.*` for documentation on any of the below functions
   keymap_buf(bufnr, 'n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
@@ -83,6 +83,11 @@ if cmp then
   cmp.setup.filetype('gitcommit', {
     sources = cmp.config.sources({
       { name = 'buffer' },
+    })
+  })
+  cmp.setup.filetype('harpoon', {
+    sources = cmp.config.sources({
+      { name = 'path' },
     })
   })
   cmp.setup.cmdline(':', {
