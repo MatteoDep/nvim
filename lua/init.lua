@@ -1,30 +1,31 @@
+local keymap = vim.api.nvim_set_keymap
+local keymap_buf = vim.api.nvim_buf_set_keymap
+
 -- Lsp mappings
 local opts = { noremap=true, silent=true }
-vim.api.nvim_set_keymap('n', '<space>e', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
-vim.api.nvim_set_keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
-vim.api.nvim_set_keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
-vim.api.nvim_set_keymap('n', '<space>q', '<cmd>lua vim.diagnostic.setloclist()<CR>', opts)
+keymap('n', '<space>e', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
+keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
+keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
+keymap('n', '<space>q', '<cmd>lua vim.diagnostic.setloclist()<CR>', opts)
 
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
 local on_attach = function(client, bufnr)
-  --Folding
-  require('folding').on_attach()
   -- Mappings.
   -- See `:help vim.lsp.*` for documentation on any of the below functions
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<gh>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
+  keymap_buf(bufnr, 'n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+  keymap_buf(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
+  keymap_buf(bufnr, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
+  keymap_buf(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+  keymap_buf(bufnr, 'n', 'gh', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+  keymap_buf(bufnr, 'n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
+  keymap_buf(bufnr, 'n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
+  keymap_buf(bufnr, 'n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
+  keymap_buf(bufnr, 'n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+  keymap_buf(bufnr, 'n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+  keymap_buf(bufnr, 'n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  keymap_buf(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+  keymap_buf(bufnr, 'n', '<space>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
 end
 
 -- function for Tab completion
@@ -103,10 +104,77 @@ cmp.setup.cmdline('/', {
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
 local lspconfig = require('lspconfig')
-local servers = { 'clangd', 'pylsp', 'bashls', 'texlab', 'vimls' }
+local servers = { 'clangd', 'pylsp', 'bashls', 'texlab', 'vimls', 'sumneko_lua' }
+local custom_settings = {
+  sumneko_lua = {
+    Lua = {
+      runtime = {
+        -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+        version = 'LuaJIT',
+      },
+      diagnostics = {
+        -- Get the language server to recognize the `vim` global
+        globals = { 'vim' },
+      },
+      workspace = {
+        -- Make the server aware of Neovim runtime files
+        library = vim.api.nvim_get_runtime_file("", true),
+      },
+      -- Do not send telemetry data containing a randomized but unique identifier
+      telemetry = {
+        enable = false,
+      },
+    },
+  },
+}
 for _, lsp in ipairs(servers) do
+    local settings = custom_settings[lsp]
+    if settings == nil then
+      settings = {}
+    end
     lspconfig[lsp].setup {
       capabilities = capabilities,
       on_attach = on_attach,
+      settings = settings,
     }
+end
+
+-- TreeSitter
+require'nvim-treesitter.configs'.setup {
+  -- A list of parser names, or "all"
+  ensure_installed = 'all',
+  sync_install = false,
+  auto_install = true,
+  highlight = {
+    enable = true,
+    additional_vim_regex_highlighting = false,
+  },
+  indent = {
+    enable = true,
+  },
+  rainbow = {
+    enable = true,
+    extended_mode = true, -- Also highlight non-bracket delimiters like html tags, boolean or table: lang -> boolean
+    max_file_lines = nil, -- Do not enable for files with more than n lines, int
+  }
+}
+
+-- harpoon
+local harpoon_mark = require('harpoon.mark')
+vim.api.nvim_create_autocmd({ "VimEnter" }, {
+  command = [[lua vim.cmd("norm mL"); require('harpoon.term').gotoTerminal(1); vim.cmd("norm mT'L")]],
+})
+vim.api.nvim_create_autocmd({ "BufWrite" }, {
+  command = "silent! lua harpoon_mark.add_file()",
+})
+keymap('n', "<A-tab", "<cmd>lua require('harpoon.ui').nav_next()<CR>", opts)
+keymap('n', "<S-tab", "<cmd>lua require('harpoon.ui').nav_prev()<CR>", opts)
+keymap('n', "<A-h>", "<cmd>lua require('harpoon.ui').toggle_quick_menu()<CR>", opts)
+keymap('n', "<space>c", "<cmd>lua require('harpoon.term').sendCommand(1, 'compile '..vim.fn.expand('%:p:t')..'\\n')<CR>", opts)
+keymap('n', "<A-t>", "mL'Ti", opts)
+keymap("t", "<A-t>", "<C-\\><C-n>mT'L", opts)
+for i = 1,harpoon_mark.get_length(),1 do
+  local si = string.format('%d', i)
+  keymap('n', "<A-"..si..">", "<cmd>lua require('harpoon.ui').nav_file("..si..")<CR>", opts)
+  keymap('t', "<A-"..si..">", "<C-\\><C-n><cmd>lua require('harpoon.term').gotoTerminal("..si..")<CR>i", opts)
 end
