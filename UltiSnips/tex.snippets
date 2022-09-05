@@ -1,6 +1,6 @@
 global !p
 
-def remaining_size(i):
+def remaining_size(i, offset=0):
 	n = len(t[i])
 	try:
 		num = float('0.'+t[i])
@@ -9,7 +9,7 @@ def remaining_size(i):
 	if n == 0:
 		return ""
 	else:
-		return ("{0:."+str(n)+"f}").format(1 - num).split('.')[1]
+		return ("{0:."+str(n)+"f}").format(1 - offset - num).split('.')[1]
 
 endglobal
 
@@ -25,11 +25,11 @@ endsnippet
 snippet figs "figure with subfigure"
 \begin{figure}[ht]
 	\centering
-	\begin{subfigure}{.${5:5}\textwidth}
+	\begin{subfigure}{.${5:49}\textwidth}
 		\includegraphics[width=\textwidth]{$1}
 		\caption{\label{fig:sub1}}
 	\end{subfigure}
-	\begin{subfigure}{.${6:`!p snip.rv = remaining_size(5)`}\textwidth}
+	\begin{subfigure}{.${6:`!p snip.rv = remaining_size(5, offset=0.02)`}\textwidth}
 		\includegraphics[width=\textwidth]{$2}
 		\caption{\label{fig:sub2}}
 	\end{subfigure}
@@ -39,9 +39,9 @@ snippet figs "figure with subfigure"
 endsnippet
 
 snippet subfig "add subfigure"
-\begin{subfigure}{.${3:5}\textwidth}
+\begin{subfigure}{.${3:49}\textwidth}
 	\includegraphics[width=\textwidth]{$1}
-	\caption{\label{fig:sub${2:1}}
+	\caption{\label{fig:sub${2:1}}}
 \end{subfigure}
 endsnippet
 
@@ -53,7 +53,8 @@ endsnippet
 
 snippet eq "equation"
 \begin{equation}
-	$1
+	$2
+	\label{eq:$1}
 \end{equation}$0
 endsnippet
 
