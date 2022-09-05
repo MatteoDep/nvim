@@ -5,3 +5,4 @@ paru -S clang
 paru -S bash-language-server
 paru -S texlab
 paru -S vim-language-server
+paru -S lua-language-server

@@ -17,12 +17,9 @@ call plug#begin('~/.config/nvim/plugged')
 	Plug 'tpope/vim-commentary'
 	" extend repeat (.) abilities
 	Plug 'tpope/vim-repeat'
-	" git in vim!
-	Plug 'tpope/vim-fugitive'
-		" folds
-	Plug 'vitaly/folding-nvim'
-	" align text
-	Plug 'godlygeek/tabular'
+	" Harpoon
+	Plug 'nvim-lua/plenary.nvim'
+	Plug 'ThePrimeagen/harpoon'
 	" lsp
 	Plug 'neovim/nvim-lspconfig'
 	" complete
@@ -34,11 +31,15 @@ call plug#begin('~/.config/nvim/plugged')
 	Plug 'quangnguyen30192/cmp-nvim-ultisnips'
 	" snippets tool
 	Plug 'SirVer/ultisnips'
+	" treesitter
+	Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+	Plug 'nvim-treesitter/nvim-treesitter-context'
+	Plug 'p00f/nvim-ts-rainbow'
 	" fzf
 	Plug 'junegunn/fzf'
 	Plug 'junegunn/fzf.vim'
-	" float terminal
-	Plug 'voldikss/vim-floaterm'
+	" align text
+	Plug 'godlygeek/tabular'
 	" color previews
 	Plug 'rrethy/vim-hexokinase', { 'do': 'make hexokinase' }
 call plug#end()
@@ -68,19 +69,17 @@ set conceallevel=2
 set spelllang=en_gb,it
 set nrformats=bin,hex,alpha		   " to use ctrl-a and ctrl-x
 set formatoptions=tcrvqlj
-set foldlevel=100
 " theme
 colorscheme custom
 set termguicolors
 " transparent background
 hi Normal guibg=NONE ctermbg=NONE
 " airline
-let g:airline#extensions#tabline#enabled = 1
-let g:webdevicons_enable_airline_tabline = 1
 let g:webdevicons_enable_airline_statusline = 1
 let g:airline_theme='custom'
 " hexokinase
 let g:Hexokinase_highlighters = ['backgroundfull']
+let g:Hexokinase_ftEnabled = ['css', 'html', 'javascript']
 " tabs
 set tabstop=4
 set shiftwidth=4
@@ -90,22 +89,16 @@ set noexpandtab
 let g:loaded_python_provider = 0
 let g:python3_host_prog = '~/.config/nvim/nvim-pyenv/bin/python'
 " folding
-set foldmethod=syntax
-autocmd BufEnter,BufRead *rc set foldmethod=marker
-autocmd Filetype vim set foldmethod=marker
-" floaterm
-let g:floaterm_title  = "terminal"
-let g:floaterm_wintype  = "split"
-let g:floaterm_height = 0.8
-let g:floaterm_width  = 0.8
+set foldmethod=expr
+set foldexpr=nvim_treesitter#foldexpr()
 " fzf
-let g:fzf_layout = { 'down': '50%' }
+let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.6 } }
+let g:fzf_colors = {
+	\ 'bg':      ['bg', 'CursorLine', 'CursorColumn'],
+	\ 'border':  ['fg', 'Normal'],
+	\ }
 
 " general autocmds
-augroup VimStartup
-	au!
-	au VimEnter * if expand("%") == "" | Explore | endif
-augroup END
 augroup Format
 	au!
 	au BufWrite * :%s/\s\+$//e
@@ -129,17 +122,14 @@ augroup END
 augroup FiletypeDetection
 	au!
 	au BufRead,BufNewFile,BufEnter *.tex setfiletype tex
+augroup END
 
 " KEY BINDINGS
 
 " definitions
 let mapleader = " "
-function RunInFloaterm(text)
-	FloatermToggle
-	execute "!xdotool type '".a:text."'\<CR>"
-endfunction
 
-nnoremap <leader>1 :LspStop \| :set all& \| :source ~/.config/nvim/init.vim<CR>
+nnoremap <leader>1 :source ~/.config/nvim/init.vim<CR>
 nnoremap <leader>2 :colorscheme custom \| :AirlineTheme custom<CR>
 " access system clipboard
 vnoremap <leader>y "+y
@@ -150,8 +140,6 @@ nnoremap <leader>p "+p
 nnoremap <leader>P "+P
 " spell check
 nnoremap <F6> :setlocal spell!<CR>
-" compile
-nnoremap <silent> <leader>c :w \| call RunInFloaterm('compile '.expand('%'))<CR>
 "folding
 nnoremap <silent> <Space><Space> za
 nnoremap <silent> <Space><CR> zA
@@ -160,11 +148,8 @@ nnoremap <F4> :HexokinaseToggle<CR>
 
 " easier exploration/substitution
 " fzf
-nnoremap <A-e> :Explore<CR>
 nnoremap <A-f> :Files<CR>
-nnoremap <A-g> :GFiles<CR>
 nnoremap <A-l> :Lines<CR>
-nnoremap <A-b> :Buffers<CR>
 vnoremap gR y:Rg <C-r>=escape(@",'/\')<CR><CR>
 nnoremap gR yiw:Rg <C-r>"<CR>
 " search text in buffer
@@ -175,8 +160,8 @@ vnoremap <leader>s y:%s/\V<C-R>=escape(@",'/\')<CR>//gc<Left><Left><Left>
 nnoremap <leader>s yiw:%s/\<<C-R>"\>//gc<Left><Left><Left>
 
 " navigate through buffers
-nnoremap <A-Tab> :bnext<CR>
-nnoremap <S-Tab> :bprev<CR>
+" nnoremap <A-Tab> :bnext<CR>
+" nnoremap <S-Tab> :bprev<CR>
 nnoremap ZX :bdel<CR>
 
 " navigate through splits
@@ -190,11 +175,7 @@ nnoremap <C-n> :cnext<CR>
 nnoremap <C-p> :cprev<CR>
 nnoremap <C-q> :cclose<CR>
 
-" floaterm
-let g:floaterm_keymap_new	= '<F9>'
-let g:floaterm_keymap_prev   = '<F10>'
-let g:floaterm_keymap_next   = '<F11>'
-let g:floaterm_keymap_toggle = '<F12>'
+" term
 tnoremap <A-Space> <C-\><C-n>
 
 " lsp
