@@ -68,14 +68,6 @@ set conceallevel=2
 set spelllang=en_gb,it
 set nrformats=bin,hex,alpha		   " to use ctrl-a and ctrl-x
 set formatoptions=tcrvqlj
-" theme
-colorscheme custom
-set termguicolors
-" transparent background
-hi Normal guibg=NONE ctermbg=NONE
-" airline
-let g:webdevicons_enable_airline_statusline = 1
-let g:airline_theme='custom'
 " hexokinase
 let g:Hexokinase_highlighters = ['backgroundfull']
 let g:Hexokinase_ftEnabled = ['css', 'html', 'javascript']
@@ -129,7 +121,6 @@ augroup END
 let mapleader = " "
 
 nnoremap <leader>1 :source ~/.config/nvim/init.vim<CR>
-nnoremap <leader>2 :colorscheme custom \| :AirlineTheme custom<CR>
 " access system clipboard
 vnoremap <leader>y "+y
 nnoremap <leader>yy "+yy
