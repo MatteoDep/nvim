@@ -35,13 +35,12 @@ call plug#begin('~/.config/nvim/plugged')
 	Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 	Plug 'nvim-treesitter/nvim-treesitter-context'
 	Plug 'p00f/nvim-ts-rainbow'
-	" fzf
-	Plug 'junegunn/fzf'
-	Plug 'junegunn/fzf.vim'
 	" align text
 	Plug 'godlygeek/tabular'
 	" color previews
 	Plug 'rrethy/vim-hexokinase', { 'do': 'make hexokinase' }
+	" floaterm
+	Plug 'voldikss/vim-floaterm'
 call plug#end()
 
 " LUA SETTINGS
@@ -138,18 +137,18 @@ nnoremap <leader>yiw "+yiw
 vnoremap <leader>p "+p
 nnoremap <leader>p "+p
 nnoremap <leader>P "+P
-" spell check
-nnoremap <F6> :setlocal spell!<CR>
 "folding
 nnoremap <silent> <Space><Space> za
 nnoremap <silent> <Space><CR> zA
+" spell check
+nnoremap <F6> :setlocal spell!<CR>
 " hexokinase
 nnoremap <F4> :HexokinaseToggle<CR>
 
 " easier exploration/substitution
 " fzf
-nnoremap <A-f> :Files<CR>
-nnoremap <A-l> :Lines<CR>
+" nnoremap <A-f> :Files<CR>
+" nnoremap <A-l> :Lines<CR>
 vnoremap gR y:Rg <C-r>=escape(@",'/\')<CR><CR>
 nnoremap gR yiw:Rg <C-r>"<CR>
 " search text in buffer
@@ -174,9 +173,6 @@ nnoremap <C-l> <C-w>l
 nnoremap <C-n> :cnext<CR>
 nnoremap <C-p> :cprev<CR>
 nnoremap <C-q> :cclose<CR>
-
-" term
-tnoremap <A-Space> <C-\><C-n>
 
 " lsp
 nnoremap <F7> :LspStart<CR>

@@ -35,8 +35,8 @@ local has_words_before = function()
 end
 
 -- Setup nvim-cmp.
-local cmp_ultisnips_mappings = require("cmp_nvim_ultisnips.mappings")
-local cmp = require 'cmp'
+-- local cmp_ultisnips_mappings = require("cmp_nvim_ultisnips.mappings")
+local cmp = require('cmp')
 cmp.setup {
   snippet = {
     expand = function(args)
@@ -105,7 +105,7 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
 local lspconfig = require('lspconfig')
 local servers = { 'clangd', 'pylsp', 'bashls', 'texlab', 'vimls', 'sumneko_lua' }
-local custom_settings = {
+local settings = {
   sumneko_lua = {
     Lua = {
       runtime = {
@@ -128,14 +128,13 @@ local custom_settings = {
   },
 }
 for _, lsp in ipairs(servers) do
-    local settings = custom_settings[lsp]
-    if settings == nil then
-      settings = {}
+    if settings[lsp] == nil then
+      settings[lsp] = {}
     end
     lspconfig[lsp].setup {
       capabilities = capabilities,
       on_attach = on_attach,
-      settings = settings,
+      settings = settings[lsp],
     }
 end
 
@@ -160,21 +159,47 @@ require'nvim-treesitter.configs'.setup {
 }
 
 -- harpoon
-local harpoon_mark = require('harpoon.mark')
+Startup = function ()
+  if vim.fn.expand('%') == '' then
+    vim.cmd("lua require('harpoon.ui').toggle_quick_menu()")
+  end
+end
 vim.api.nvim_create_autocmd({ "VimEnter" }, {
-  command = [[lua vim.cmd("norm mL"); require('harpoon.term').gotoTerminal(1); vim.cmd("norm mT'L")]],
+  command = "lua Startup()",
 })
 vim.api.nvim_create_autocmd({ "BufWrite" }, {
-  command = "silent! lua harpoon_mark.add_file()",
+  command = "silent! lua require('harpoon.mark').add_file()",
 })
-keymap('n', "<A-tab", "<cmd>lua require('harpoon.ui').nav_next()<CR>", opts)
-keymap('n', "<S-tab", "<cmd>lua require('harpoon.ui').nav_prev()<CR>", opts)
+keymap('n', "<A-Tab>", "<cmd>lua require('harpoon.ui').nav_next()<CR>", opts)
+keymap('n', "<S-Tab>", "<cmd>lua require('harpoon.ui').nav_prev()<CR>", opts)
 keymap('n', "<A-h>", "<cmd>lua require('harpoon.ui').toggle_quick_menu()<CR>", opts)
-keymap('n', "<space>c", "<cmd>lua require('harpoon.term').sendCommand(1, 'compile '..vim.fn.expand('%:p:t')..'\\n')<CR>", opts)
-keymap('n', "<A-t>", "mL'Ti", opts)
-keymap("t", "<A-t>", "<C-\\><C-n>mT'L", opts)
-for i = 1,harpoon_mark.get_length(),1 do
+for i = 1,9,1 do
   local si = string.format('%d', i)
   keymap('n', "<A-"..si..">", "<cmd>lua require('harpoon.ui').nav_file("..si..")<CR>", opts)
-  keymap('t', "<A-"..si..">", "<C-\\><C-n><cmd>lua require('harpoon.term').gotoTerminal("..si..")<CR>i", opts)
 end
+
+-- floaterm
+-- bg jobs
+vim.g.floaterm_opener = 'edit'
+SendjobToFloatermBG = function (command)
+  vim.cmd("FloatermToggle --name=bg")
+  vim.cmd("FloatermHide --name=bg")
+  vim.cmd("FloatermSend --name=bg "..command)
+  vim.cmd("stopinsert") -- why is this needed?
+end
+keymap('n', "<A-c>", "<cmd>lua SendjobToFloatermBG('compile %')<CR>", opts)
+keymap('n', "<A-b>", "<cmd>FloatermToggle --name=bg<CR>", opts)
+keymap("t", "<A-b>", "<C-\\><C-n><cmd>FloatermToggle --name=bg<CR>", opts)
+
+-- commands
+keymap('n', "<A-e>", "<cmd>FloatermNew ranger<CR>", opts)
+keymap('n', "<A-f>", "<cmd>FloatermNew fzf<CR>", opts)
+keymap('n', "<A-g>", "<cmd>FloatermNew lazygit<CR>", opts)
+
+-- interactive
+keymap('n', "<A-t>", "<cmd>FloatermToggle<CR>", opts)
+keymap("t", "<A-t>", "<C-\\><C-n><cmd>FloatermToggle<CR>", opts)
+keymap("t", "<A-space>", "<C-\\><C-n>", opts)
+keymap('t', "<A-n>", "<C-\\><C-n><cmd>FloatermNew<CR>", opts)
+keymap('t', "<A-Tab>", "<C-\\><C-n><cmd>FloatermNext<CR>", opts)
+keymap('t', "<S-Tab>", "<C-\\><C-n><cmd>FloatermPrev<CR>", opts)
