@@ -6,11 +6,10 @@ def print_doc(snip, text):
 		args = [a.strip(' ').split('=')[0] for a in args if a!="self"]
 	except IndexError:
 		pass
-	snip >> 1
+	snip.shift(1)
 	for a in args:
-		if len(a) > 0:
-			snip += snip.mkline("\t:param ".expandtabs(4)+a+":\n")
-	snip.rv += snip.mkline("\t:return:".expandtabs(4))
+		snip.rv += snip.mkline(f":param {a}:\n")
+	snip.rv += snip.mkline(":return:")
 
 endglobal
 
@@ -44,21 +43,14 @@ endsnippet
 
 snippet "def ([\w_]*)\((.*)\):\.d" "create docstring" r
 `!p snip.rv = "def " + match.group(1) + "(" + match.group(2) + "):"`
-	"""
-	$0
+	"""$1.$0
 
 `!p print_doc(snip, match.group(2))`
 	"""
 endsnippet
 
-snippet dd
-"""
-$0.
-"""
-endsnippet
-
 snippet d
-"""$0."""
+"""$1.$0"""
 endsnippet
 
 snippet ff
