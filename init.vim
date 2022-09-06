@@ -82,12 +82,6 @@ let g:python3_host_prog = '~/.config/nvim/nvim-pyenv/bin/python'
 " folding
 set foldmethod=expr
 set foldexpr=nvim_treesitter#foldexpr()
-" fzf
-let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.6 } }
-let g:fzf_colors = {
-	\ 'bg':      ['bg', 'CursorLine', 'CursorColumn'],
-	\ 'border':  ['fg', 'Normal'],
-	\ }
 
 " general autocmds
 augroup Format
