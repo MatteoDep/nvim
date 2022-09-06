@@ -162,15 +162,13 @@ require'nvim-treesitter.configs'.setup {
 }
 
 -- harpoon
-Startup = function ()
-  vim.cmd("FloatermNew --silent")
-  if vim.fn.expand('%') == '' then
-    vim.cmd("lua require('harpoon.ui').toggle_quick_menu()")
-  end
-end
-vim.api.nvim_create_autocmd({ "VimEnter" }, {
-  command = "lua Startup()",
+require("harpoon").setup({
+  menu = {
+    width = math.floor(vim.api.nvim_win_get_width(0) / 3),
+  },
+  excluded_filetypes = { "harpoon", "help", "floaterm" },
 })
+
 vim.api.nvim_create_autocmd({ "BufRead" }, {
   command = "silent! lua require('harpoon.mark').add_file()",
 })
@@ -211,7 +209,22 @@ RefreshColorscheme = function ()
   vim.cmd("colorscheme custom")
   vim.cmd("AirlineTheme custom")
   vim.cmd("hi Normal guibg=NONE ctermbg=NONE")
+  vim.cmd("redraw")
 end
 vim.api.nvim_create_autocmd({ "Signal SIGUSR1" }, {
   command = "lua RefreshColorscheme()",
+})
+
+-- Startup
+Startup = function ()
+  vim.cmd("FloatermNew --silent")
+  if vim.fn.expand('%') == '' then
+    vim.cmd("lua require('harpoon.ui').toggle_quick_menu()")
+  elseif vim.fn.isdirectory(vim.fn.expand('%')) then
+    vim.cmd("bdelete")
+    vim.cmd("FloatermNew ranger")
+  end
+end
+vim.api.nvim_create_autocmd({ "VimEnter" }, {
+  command = "lua Startup()",
 })
