@@ -28,13 +28,14 @@ local on_attach = function(_, bufnr)
   keymap_buf(bufnr, 'n', '<space>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
 end
 
+-- completion
 -- function for Tab completion
 local has_words_before = function()
   local line, col = unpack(vim.api.nvim_win_get_cursor(0))
   return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
 end
 
--- Setup nvim-cmp.
+-- setup nvim-cmp.
 -- local cmp_ultisnips_mappings = require("cmp_nvim_ultisnips.mappings")
 local cmp = require('cmp')
 if cmp then
@@ -83,11 +84,6 @@ if cmp then
   cmp.setup.filetype('gitcommit', {
     sources = cmp.config.sources({
       { name = 'buffer' },
-    })
-  })
-  cmp.setup.filetype('harpoon', {
-    sources = cmp.config.sources({
-      { name = 'path' },
     })
   })
   cmp.setup.cmdline(':', {
@@ -178,7 +174,7 @@ end
 vim.api.nvim_create_autocmd({ "VimEnter" }, {
   command = "lua Startup()",
 })
-vim.api.nvim_create_autocmd({ "BufWrite" }, {
+vim.api.nvim_create_autocmd({ "BufRead" }, {
   command = "silent! lua require('harpoon.mark').add_file()",
 })
 keymap('n', "<A-Tab>", "<cmd>lua require('harpoon.ui').nav_next()<CR>", opts)
