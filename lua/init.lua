@@ -129,6 +129,15 @@ local settings = {
       },
     },
   },
+  pylsp = {
+    pylsp = {
+      plugins = {
+        mccabe = {
+          enabled = false,
+        },
+      },
+    },
+  },
 }
 for _, lsp in ipairs(servers) do
     if settings[lsp] == nil then
