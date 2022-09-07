@@ -220,9 +220,6 @@ Startup = function ()
   vim.cmd("FloatermNew --silent")
   if vim.fn.expand('%') == '' then
     vim.cmd("lua require('harpoon.ui').toggle_quick_menu()")
-  elseif vim.fn.isdirectory(vim.fn.expand('%')) then
-    vim.cmd("bdelete")
-    vim.cmd("FloatermNew ranger")
   end
 end
 vim.api.nvim_create_autocmd({ "VimEnter" }, {
