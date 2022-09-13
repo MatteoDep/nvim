@@ -6,4 +6,3 @@ p -S bash-language-server
 p -S texlab
 paru -S vim-language-server
 paru -S lua-language-server
-paru -S ltex-ls-bin
