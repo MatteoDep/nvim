@@ -135,8 +135,8 @@ nnoremap <F4> :HexokinaseToggle<CR>
 " fzf
 " nnoremap <A-f> :Files<CR>
 " nnoremap <A-l> :Lines<CR>
-vnoremap gR y:Rg <C-r>=escape(@",'/\')<CR><CR>
-nnoremap gR yiw:Rg <C-r>"<CR>
+vnoremap gR y:FloatermNew rg <C-r>=escape(@",'/\')<CR><CR>
+nnoremap gR yiw:FloatermNew rg <C-r>"<CR>
 " search text in buffer
 vnoremap <leader>l y:Lines <C-R>=escape(@",'/\')<CR><CR>
 nnoremap <leader>l yiw:Lines <C-R>"<CR>
