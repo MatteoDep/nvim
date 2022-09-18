@@ -41,6 +41,8 @@ call plug#begin('~/.config/nvim/plugged')
 	Plug 'rrethy/vim-hexokinase', { 'do': 'make hexokinase' }
 	" floaterm
 	Plug 'voldikss/vim-floaterm'
+	" local history
+	Plug 'mbbill/undotree'
 call plug#end()
 
 " LUA SETTINGS
@@ -68,6 +70,7 @@ set conceallevel=2
 set spelllang=en_us,it
 set nrformats=bin,hex,alpha		   " to use ctrl-a and ctrl-x
 set formatoptions=tcrvqlj
+set mouse=
 " hexokinase
 let g:Hexokinase_highlighters = ['backgroundfull']
 let g:Hexokinase_ftEnabled = ['css', 'html', 'javascript']

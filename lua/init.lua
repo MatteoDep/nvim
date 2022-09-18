@@ -1,6 +1,5 @@
 local keymap = vim.api.nvim_set_keymap
 local keymap_buf = vim.api.nvim_buf_set_keymap
-
 -- Lsp mappings
 local opts = { noremap=true, silent=true }
 keymap('n', '<space>e', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
@@ -202,8 +201,8 @@ keymap('n', "<A-g>", "<cmd>FloatermNew lazygit<CR>", opts)
 
 -- interactive
 keymap('n', "<A-t>", "<cmd>FloatermToggle<CR>", opts)
-keymap("t", "<A-t>", "<C-\\><C-n><cmd>FloatermToggle<CR>", opts)
-keymap("t", "<A-space>", "<C-\\><C-n>", opts)
+keymap('t', "<A-t>", "<C-\\><C-n><cmd>FloatermToggle<CR>", opts)
+keymap('t', "<A-space>", "<C-\\><C-n>", opts)
 keymap('t', "<A-n>", "<C-\\><C-n><cmd>FloatermNew<CR>", opts)
 keymap('t', "<A-Tab>", "<C-\\><C-n><cmd>FloatermNext<CR>", opts)
 keymap('t', "<S-Tab>", "<C-\\><C-n><cmd>FloatermPrev<CR>", opts)
@@ -213,7 +212,7 @@ vim.cmd("colorscheme custom")
 vim.api.nvim_set_option('termguicolors', true)
 vim.cmd("hi Normal guibg=NONE ctermbg=NONE")
 vim.g.webdevicons_enable_airline_statusline = 1
-vim.g.airline_theme='custom'
+vim.g.airline_theme = 'custom'
 RefreshColorscheme = function ()
   vim.cmd("colorscheme custom")
   vim.cmd("AirlineTheme custom")
@@ -234,3 +233,11 @@ end
 vim.api.nvim_create_autocmd({ "VimEnter" }, {
   command = "lua Startup()",
 })
+
+-- undo tree
+keymap('n', "<F5>", "<cmd>UndotreeToggle<CR>", opts)
+keymap('n', "U", "<cmd>UndotreeShow<CR><cmd>UndotreeFocus<CR>", opts)
+local undodir = vim.fn.expand("$XDG_CACHE_HOME/nvim/undo")
+os.execute('mkdir -p '..undodir)
+vim.api.nvim_set_option('undodir', undodir)
+vim.api.nvim_set_option('undofile', true)
