@@ -1,30 +1,31 @@
-local keymap = vim.api.nvim_set_keymap
-local keymap_buf = vim.api.nvim_buf_set_keymap
+local map = vim.keymap.set
 -- Lsp mappings
 local opts = { noremap=true, silent=true }
-keymap('n', '<space>e', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
-keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
-keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
-keymap('n', '<space>q', '<cmd>lua vim.diagnostic.setloclist()<CR>', opts)
+map('n', '<space>e', function() vim.diagnostic.open_float() end, opts)
+map('n', '[d', function() vim.diagnostic.goto_prev() end, opts)
+map('n', ']d', function() vim.diagnostic.goto_next() end, opts)
+map('n', '<space>q', function() vim.diagnostic.setloclist() end, opts)
 
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
 local on_attach = function(_, bufnr)
   -- Mappings.
   -- See `:help vim.lsp.*` for documentation on any of the below functions
-  keymap_buf(bufnr, 'n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-  keymap_buf(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
-  keymap_buf(bufnr, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
-  keymap_buf(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-  keymap_buf(bufnr, 'n', 'gh', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-  keymap_buf(bufnr, 'n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
-  keymap_buf(bufnr, 'n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
-  keymap_buf(bufnr, 'n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-  keymap_buf(bufnr, 'n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-  keymap_buf(bufnr, 'n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-  keymap_buf(bufnr, 'n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-  keymap_buf(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-  keymap_buf(bufnr, 'n', '<space>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
+  local buf_opts = opts
+  buf_opts['buffer'] = bufnr
+  map('n', 'gD', function() vim.lsp.buf.declaration() end, buf_opts)
+  map('n', 'gd', function() vim.lsp.buf.definition() end, buf_opts)
+  map('n', 'K', function() vim.lsp.buf.hover() end, buf_opts)
+  map('n', 'gi', function() vim.lsp.buf.implementation() end, buf_opts)
+  map('n', 'gh', function() vim.lsp.buf.signature_help() end, buf_opts)
+  map('n', '<space>wa', function() vim.lsp.buf.add_workspace_folder() end, buf_opts)
+  map('n', '<space>wr', function() vim.lsp.buf.remove_workspace_folder() end, buf_opts)
+  map('n', '<space>wl', function() print(vim.inspect(vim.lsp.buf.list_workspace_folders())) end, buf_opts)
+  map('n', '<space>D', function() vim.lsp.buf.type_definition() end, buf_opts)
+  map('n', '<space>rn', function() vim.lsp.buf.rename() end, buf_opts)
+  map('n', '<space>ca', function() vim.lsp.buf.code_action() end, buf_opts)
+  map('n', 'gr', function() vim.lsp.buf.references() end, buf_opts)
+  map('n', '<space>f', function() vim.lsp.buf.formatting() end, buf_opts)
 end
 
 -- completion
@@ -75,7 +76,10 @@ if cmp then
     { name = 'nvim_lsp' },
     { name = 'ultisnips' },
     { name = 'buffer' },
-    { name = 'path' },
+    {
+      name = 'path',
+      option = { get_cwd = function() return vim.env.PWD end },
+    }
   },
 }
 
@@ -180,32 +184,32 @@ require("harpoon").setup({
 vim.api.nvim_create_autocmd({ "BufRead" }, {
   command = "silent! lua require('harpoon.mark').add_file()",
 })
-keymap('n', "<A-Tab>", "<cmd>lua require('harpoon.ui').nav_next()<CR>", opts)
-keymap('n', "<S-Tab>", "<cmd>lua require('harpoon.ui').nav_prev()<CR>", opts)
-keymap('n', "<A-h>", "<cmd>lua require('harpoon.ui').toggle_quick_menu()<CR>", opts)
-keymap('n', "<A-n>", "<cmd>lua require('harpoon.mark').add_file()<CR>", opts)
+map('n', "<A-Tab>", function() require('harpoon.ui').nav_next() end, opts)
+map('n', "<S-Tab>", function() require('harpoon.ui').nav_prev() end, opts)
+map('n', "<A-h>", function() require('harpoon.ui').toggle_quick_menu() end, opts)
+map('n', "<A-n>", function() require('harpoon.mark').add_file() end, opts)
 for i = 1,9,1 do
   local si = string.format('%d', i)
-  keymap('n', "<A-"..si..">", "<cmd>lua require('harpoon.ui').nav_file("..si..")<CR>", opts)
+  map('n', "<A-"..si..">", function() require('harpoon.ui').nav_file("..si..") end, opts)
 end
 
 -- floaterm
 -- bg jobs
 vim.g.floaterm_opener = 'edit'
-keymap('n', "<A-c>", "<cmd>w<CR><cmd>FloatermSend compile %<CR>", opts)
+map('n', "<A-c>", "<cmd>w<CR><cmd>FloatermSend compile %<CR>", opts)
 
 -- commands
-keymap('n', "<A-e>", "<cmd>FloatermNew ranger --cmd='set preview_images=false'<CR>", opts)
-keymap('n', "<A-f>", "<cmd>FloatermNew fzf -m<CR>", opts)
-keymap('n', "<A-g>", "<cmd>FloatermNew lazygit<CR>", opts)
+map('n', "<A-e>", "<cmd>FloatermNew ranger --cmd='set preview_images=false'<CR>", opts)
+map('n', "<A-f>", "<cmd>FloatermNew fzf -m<CR>", opts)
+map('n', "<A-g>", "<cmd>FloatermNew lazygit<CR>", opts)
 
 -- interactive
-keymap('n', "<A-t>", "<cmd>FloatermToggle<CR>", opts)
-keymap('t', "<A-t>", "<C-\\><C-n><cmd>FloatermToggle<CR>", opts)
-keymap('t', "<A-space>", "<C-\\><C-n>", opts)
-keymap('t', "<A-n>", "<C-\\><C-n><cmd>FloatermNew<CR>", opts)
-keymap('t', "<A-Tab>", "<C-\\><C-n><cmd>FloatermNext<CR>", opts)
-keymap('t', "<S-Tab>", "<C-\\><C-n><cmd>FloatermPrev<CR>", opts)
+map('n', "<A-t>", "<cmd>FloatermToggle<CR>", opts)
+map('t', "<A-t>", "<C-\\><C-n><cmd>FloatermToggle<CR>", opts)
+map('t', "<A-space>", "<C-\\><C-n>", opts)
+map('t', "<A-n>", "<C-\\><C-n><cmd>FloatermNew<CR>", opts)
+map('t', "<A-Tab>", "<C-\\><C-n><cmd>FloatermNext<CR>", opts)
+map('t', "<S-Tab>", "<C-\\><C-n><cmd>FloatermPrev<CR>", opts)
 
 -- theming
 vim.cmd("colorscheme custom")
@@ -213,30 +217,34 @@ vim.api.nvim_set_option('termguicolors', true)
 vim.cmd("hi Normal guibg=NONE ctermbg=NONE")
 vim.g.webdevicons_enable_airline_statusline = 1
 vim.g.airline_theme = 'custom'
-RefreshColorscheme = function ()
-  vim.cmd("colorscheme custom")
-  vim.cmd("AirlineTheme custom")
-  vim.cmd("hi Normal guibg=NONE ctermbg=NONE")
-  vim.cmd("redraw")
-end
 vim.api.nvim_create_autocmd({ "Signal SIGUSR1" }, {
-  command = "lua RefreshColorscheme()",
+  callback = function ()
+    vim.cmd [[
+      colorscheme custom
+      AirlineTheme custom
+    ]]
+    vim.api.nvim_set_hl('Normal', {
+      guibg = nil,
+      ctermbg = nil,
+    })
+    vim.cmd("redraw")
+  end
 })
 
 -- Startup
-Startup = function ()
-  vim.cmd("FloatermNew --silent")
-  if vim.fn.expand('%') == '' then
-    vim.cmd("lua require('harpoon.ui').toggle_quick_menu()")
-  end
-end
 vim.api.nvim_create_autocmd({ "VimEnter" }, {
-  command = "lua Startup()",
+  callback = function ()
+    vim.cmd("FloatermNew --silent")
+    if vim.fn.expand('%') == '' then
+      -- vim.cmd("lua require('harpoon.ui').toggle_quick_menu()")
+      require('harpoon.ui').toggle_quick_menu()
+    end
+  end
 })
 
 -- undo tree
-keymap('n', "<F5>", "<cmd>UndotreeToggle<CR>", opts)
-keymap('n', "U", "<cmd>UndotreeShow<CR><cmd>UndotreeFocus<CR>", opts)
+map('n', "<F5>", "<cmd>UndotreeToggle<CR>", opts)
+map('n', "U", "<cmd>UndotreeShow<CR><cmd>UndotreeFocus<CR>", opts)
 local undodir = vim.fn.expand("$XDG_CACHE_HOME/nvim/undo")
 os.execute('mkdir -p '..undodir)
 vim.api.nvim_set_option('undodir', undodir)
