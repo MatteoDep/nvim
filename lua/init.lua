@@ -204,17 +204,19 @@ map('n', "<A-f>", "<cmd>FloatermNew fzf -m<CR>", opts)
 map('n', "<A-g>", "<cmd>FloatermNew lazygit<CR>", opts)
 
 -- interactive
-map('n', "<A-t>", "<cmd>FloatermToggle<CR>", opts)
-map('t', "<A-t>", "<C-\\><C-n><cmd>FloatermToggle<CR>", opts)
+map({'n', 't'}, "<A-t>", "<cmd>FloatermToggle<CR>", opts)
+-- map('t', "<A-t>", "<C-\\><C-n><cmd>FloatermToggle<CR>", opts)
 map('t', "<A-space>", "<C-\\><C-n>", opts)
 map('t', "<A-n>", "<C-\\><C-n><cmd>FloatermNew<CR>", opts)
 map('t', "<A-Tab>", "<C-\\><C-n><cmd>FloatermNext<CR>", opts)
 map('t', "<S-Tab>", "<C-\\><C-n><cmd>FloatermPrev<CR>", opts)
 
 -- theming
-vim.cmd("colorscheme custom")
-vim.api.nvim_set_option('termguicolors', true)
-vim.cmd("hi Normal guibg=NONE ctermbg=NONE")
+vim.cmd [[
+  colorscheme custom
+  hi Normal guibg=NONE ctermbg=NONE
+]]
+vim.opt.termguicolors = true
 vim.g.webdevicons_enable_airline_statusline = 1
 vim.g.airline_theme = 'custom'
 vim.api.nvim_create_autocmd({ "Signal SIGUSR1" }, {
@@ -222,12 +224,10 @@ vim.api.nvim_create_autocmd({ "Signal SIGUSR1" }, {
     vim.cmd [[
       colorscheme custom
       AirlineTheme custom
+      hi Normal guibg=NONE ctermbg=NONE
+      redraw!
+      redrawtabline
     ]]
-    vim.api.nvim_set_hl('Normal', {
-      guibg = nil,
-      ctermbg = nil,
-    })
-    vim.cmd("redraw")
   end
 })
 
@@ -243,9 +243,10 @@ vim.api.nvim_create_autocmd({ "VimEnter" }, {
 })
 
 -- undo tree
+vim.opt.undodir = undodir
+vim.opt.undofile = true
 map('n', "<F5>", "<cmd>UndotreeToggle<CR>", opts)
 map('n', "U", "<cmd>UndotreeShow<CR><cmd>UndotreeFocus<CR>", opts)
 local undodir = vim.fn.expand("$XDG_CACHE_HOME/nvim/undo")
 os.execute('mkdir -p '..undodir)
-vim.api.nvim_set_option('undodir', undodir)
-vim.api.nvim_set_option('undofile', true)
+vim.g.undotree_WindowLayout = 3
