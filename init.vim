@@ -50,42 +50,6 @@ lua require('init')
 
 " GENERAL CONFIGS
 
-" general
-syntax enable						 " Enables syntax highlighting
-filetype plugin on					" vim built-in plugins
-set completeopt=menu,menuone,noselect " completion style
-set shada+=n~/.config/nvim/main.shada " change viminfo location
-set hidden							" To keep multiple buffers open
-set nowrap							" wrap long lines
-set encoding=utf-8					" The encoding displayed
-set number relativenumber			 " See line numbers and relative numbers
-set autoindent						" Automatically leave space at the left as the starting line
-set ruler							 " Always display cursor
-set wildmenu						  " command-line completion enhanced
-set wildmode=longest,list,full		" Display all matching files when tab complete
-set nohlsearch						" don't highlight search
-set incsearch						 " incremental search
-set noerrorbells					  " disable sound error effects
-set conceallevel=2
-set spelllang=en_us,it
-set nrformats=bin,hex,alpha		   " to use ctrl-a and ctrl-x
-set formatoptions=tcrvqlj
-set mouse=
-" hexokinase
-let g:Hexokinase_highlighters = ['backgroundfull']
-let g:Hexokinase_ftEnabled = ['css', 'html', 'javascript']
-" tabs
-set tabstop=4
-set shiftwidth=4
-set softtabstop=4
-set noexpandtab
-" python support
-let g:loaded_python_provider = 0
-let g:python3_host_prog = '~/.config/nvim/nvim-pyenv/bin/python'
-" folding
-set foldmethod=expr
-set foldexpr=nvim_treesitter#foldexpr()
-
 " general autocmds
 augroup Format
 	au!
