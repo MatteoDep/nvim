@@ -74,6 +74,7 @@ augroup END
 augroup FiletypeDetection
 	au!
 	au BufRead,BufNewFile,BufEnter *.tex setfiletype tex
+	au BufRead,BufNewFile,BufEnter *.cls setfiletype tex
 augroup END
 
 " KEY BINDINGS
@@ -97,15 +98,6 @@ nnoremap <F6> :setlocal spell!<CR>
 " hexokinase
 nnoremap <F4> :HexokinaseToggle<CR>
 
-" easier exploration/substitution
-" fzf
-" nnoremap <A-f> :Files<CR>
-" nnoremap <A-l> :Lines<CR>
-vnoremap gR y:FloatermNew rg <C-r>=escape(@",'/\')<CR><CR>
-nnoremap gR yiw:FloatermNew rg <C-r>"<CR>
-" search text in buffer
-vnoremap <leader>l y:Lines <C-R>=escape(@",'/\')<CR><CR>
-nnoremap <leader>l yiw:Lines <C-R>"<CR>
 " substitute text in buffer
 vnoremap <leader>s y:%s/\V<C-R>=escape(@",'/\')<CR>//gc<Left><Left><Left>
 nnoremap <leader>s yiw:%s/\<<C-R>"\>//gc<Left><Left><Left>

@@ -46,18 +46,21 @@ map('n', "<A-h>", function() require('harpoon.ui').toggle_quick_menu() end, opts
 map('n', "<A-n>", function() require('harpoon.mark').add_file() end, opts)
 for i = 1,9,1 do
   local si = string.format('%d', i)
-  map('n', "<A-"..si..">", function() require('harpoon.ui').nav_file("..si..") end, opts)
+  map('n', "<A-"..si..">", function() require('harpoon.ui').nav_file(i) end, opts)
 end
 
 -- floaterm
 -- bg jobs
 vim.g.floaterm_opener = 'edit'
-map('n', "<A-c>", "<cmd>w<CR><cmd>FloatermSend compile %<CR>", opts)
+map('n', "<Space>c", "<cmd>w<CR><cmd>FloatermSend compile %<CR>", opts)
+map('n', "<Space>C", "<cmd>w<CR><cmd>FloatermSend compile --onlythis %<CR>", opts)
 
 -- commands
 map('n', "<A-e>", "<cmd>FloatermNew ranger --cmd='set preview_images=false'<CR>", opts)
 map('n', "<A-f>", "<cmd>FloatermNew fzf -m<CR>", opts)
 map('n', "<A-g>", "<cmd>FloatermNew lazygit<CR>", opts)
+map('v', "<A-r>", [[y<cmd>FloatermNew rg <C-r>=escape(@",'/\')<CR><CR>]], opts)
+map('n', "<A-r>", "yiw<cmd>FloatermNew rg <C-r><CR>", opts)
 
 -- interactive
 map({'n', 't'}, "<A-t>", "<cmd>FloatermToggle<CR>", opts)
@@ -65,7 +68,6 @@ map({'n', 't'}, "<A-t>", "<cmd>FloatermToggle<CR>", opts)
 map('t', "<A-space>", "<C-\\><C-n>", opts)
 map('t', "<A-n>", "<C-\\><C-n><cmd>FloatermNew<CR>", opts)
 map('t', "<A-Tab>", "<C-\\><C-n><cmd>FloatermNext<CR>", opts)
-map('t', "<S-Tab>", "<C-\\><C-n><cmd>FloatermPrev<CR>", opts)
 
 
 -- Startup
