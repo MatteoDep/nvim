@@ -64,7 +64,6 @@ map('n', "<A-r>", "yiw<cmd>FloatermNew rg <C-r><CR>", opts)
 
 -- interactive
 map({'n', 't'}, "<A-t>", "<cmd>FloatermToggle<CR>", opts)
--- map('t', "<A-t>", "<C-\\><C-n><cmd>FloatermToggle<CR>", opts)
 map('t', "<A-space>", "<C-\\><C-n>", opts)
 map('t', "<A-n>", "<C-\\><C-n><cmd>FloatermNew<CR>", opts)
 map('t', "<A-Tab>", "<C-\\><C-n><cmd>FloatermNext<CR>", opts)
