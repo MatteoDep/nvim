@@ -33,6 +33,14 @@ end
 local lspconfig = require('lspconfig')
 local servers = { 'clangd', 'pylsp', 'bashls', 'texlab', 'vimls', 'sumneko_lua' }
 local settings = {
+  texlab = {
+    texlab = {
+      auxDirectory = '.auxdir',
+      diagnostics = {
+        ignoredPatterns = { 'Underfull' },
+      },
+    },
+  },
   sumneko_lua = {
     Lua = {
       runtime = {
