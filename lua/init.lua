@@ -1,5 +1,6 @@
 local map = vim.keymap.set
 local opts = { noremap=true, silent=true }
+local opts_nosilent = { noremap=true }
 
 -- general options
 require('general')
@@ -29,6 +30,7 @@ require'nvim-treesitter.configs'.setup {
     max_file_lines = nil, -- Do not enable for files with more than n lines, int
   }
 }
+map('n', "<F3>", "<cmd>TSToggle highlight<CR>", opts_nosilent)
 
 -- harpoon
 require("harpoon").setup({
@@ -37,13 +39,22 @@ require("harpoon").setup({
   },
 })
 
-vim.api.nvim_create_autocmd({ "BufRead" }, {
-  callback = function() require('harpoon.mark').add_file() end,
+local function harpoon_add(bufname)
+    local function f()
+      require('harpoon.mark').add_file(bufname)
+    end
+    if pcall(f) then
+      print('Added '..bufname)
+    end
+end
+
+vim.api.nvim_create_autocmd({ "BufAdd", "BufEnter" }, {
+  callback = function() harpoon_add(vim.fn.expand('<afile>')) end,
 })
 map('n', "<A-Tab>", function() require('harpoon.ui').nav_next() end, opts)
 map('n', "<S-Tab>", function() require('harpoon.ui').nav_prev() end, opts)
 map('n', "<A-h>", function() require('harpoon.ui').toggle_quick_menu() end, opts)
-map('n', "<A-n>", function() require('harpoon.mark').add_file() end, opts)
+map('n', "<A-n>", function() harpoon_add(vim.fn.expand('%')) end, opts_nosilent)
 for i = 1,9,1 do
   local si = string.format('%d', i)
   map('n', "<A-"..si..">", function() require('harpoon.ui').nav_file(i) end, opts)
@@ -59,8 +70,8 @@ map('n', "<Space>C", "<cmd>w<CR><cmd>FloatermSend compile --onlythis %<CR>", opt
 map('n', "<A-e>", "<cmd>FloatermNew ranger --cmd='set preview_images=false'<CR>", opts)
 map('n', "<A-f>", "<cmd>FloatermNew fzf -m<CR>", opts)
 map('n', "<A-g>", "<cmd>FloatermNew lazygit<CR>", opts)
-map('v', "<A-r>", [[y<cmd>FloatermNew rg <C-r>=escape(@",'/\')<CR><CR>]], opts)
-map('n', "<A-r>", "yiw<cmd>FloatermNew rg <C-r><CR>", opts)
+map('v', "<A-r>", [[y:FloatermNew rg '<C-R>=escape(@",'/\')<CR>'<CR>]], opts)
+map('n', "<A-r>", [[yiw:FloatermNew rg '<C-R>"'<CR>]], opts)
 
 -- interactive
 map({'n', 't'}, "<A-t>", "<cmd>FloatermToggle<CR>", opts)
@@ -73,9 +84,14 @@ map('t', "<A-Tab>", "<C-\\><C-n><cmd>FloatermNext<CR>", opts)
 vim.api.nvim_create_autocmd({ "VimEnter" }, {
   callback = function ()
     vim.cmd("FloatermNew --silent")
-    if vim.fn.expand('%') == '' then
+    local argc = vim.fn.argc()
+    if argc == 0 then
       -- vim.cmd("lua require('harpoon.ui').toggle_quick_menu()")
       require('harpoon.ui').toggle_quick_menu()
+    else
+      for i = 0,argc-1,1 do
+        harpoon_add(vim.fn.argv(i))
+      end
     end
   end
 })
