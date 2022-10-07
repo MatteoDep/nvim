@@ -25,18 +25,44 @@ endsnippet
 snippet figs "figure with subfigure"
 \begin{figure}[ht]
 	\centering
-	\begin{subfigure}{.${5:45}\textwidth}
+	\begin{subcaptionblock}{.${5:49}\textwidth}
+		\caption{}labeled{$1-sub1}
 		\includegraphics[width=\textwidth]{$2}
-		\caption{\label{fig:$1-sub1}}
-	\end{subfigure}%
-	\hspace{.05\textwidth}
-	\begin{subfigure}{.${6:`!p snip.rv = remaining_size(5, offset=0.1)`}\textwidth}
+	\end{subcaptionblock}%
+	\hspace{.01\textwidth}
+	\begin{subcaptionblock}{.${6:`!p snip.rv = remaining_size(5, offset=0.02)`}\textwidth}
+		\caption{}labeled{$1-sub2}
 		\includegraphics[width=\textwidth]{$3}
-		\caption{\label{fig:$1-sub2}}
-	\end{subfigure}%
+	\end{subcaptionblock}%
 	\caption{$4}
-	\label{fig:$1}
-\end{figure}$0
+	\label{$1}
+\end{figure}
+endsnippet
+
+# \newcommand{\labeled}[3][below right]{
+# 		\phantomcaption\label{#2}
+# 		\tikz{
+# 			\node[below right,inner sep=0,outer sep=0] () at (0, 0) {\parbox{\textwidth}{#3}};
+# 			\node[#1] () at (0, 0) {\Large\bfseries\thesubfigure};
+# 		}
+# }
+snippet figsl "figure with subfigure with label on figure, depend on self defined \labeled command"
+\begin{figure}[ht]
+	\centering
+	\begin{subcaptionblock}{.${5:49}\textwidth}
+		\labeled{$1-sub1}{
+			\includegraphics[width=\textwidth]{$2}
+		}
+	\end{subcaptionblock}%
+	\hspace{.01\textwidth}
+	\begin{subcaptionblock}{.${6:`!p snip.rv = remaining_size(5, offset=0.02)`}\textwidth}
+		\labeled{$1-sub2}{
+			\includegraphics[width=\textwidth]{$3}
+		}
+	\end{subcaptionblock}%
+	\caption{$4}
+	\label{$1}
+\end{figure}
 endsnippet
 
 snippet subfig "add subfigure"
@@ -76,21 +102,15 @@ snippet it "italic text" w
 endsnippet
 
 snippet s "section"
-\section{$1}
-
-$0
+\section{$1}$0
 endsnippet
 
 snippet ss "subsection"
-\subsection{$1}
-
-$0
+\subsection{$1}$0
 endsnippet
 
 snippet sss "subsubsection"
-\subsubsection{$1}
-
-$0
+\subsubsection{$1}$0
 endsnippet
 
 snippet ul "un-numbered list"
@@ -131,14 +151,22 @@ snippet im "includegraphics"
 \includegraphics[width=.${1:6}\textwidth]{$2}$0
 endsnippet
 
-snippet footcountremove
+snippet fnm "footnotemark. Needs footnotetext afterwards"
+\footnotemark
+endsnippet
+
+snippet footcountremove "decrease footnote count by one. Useful when using multiple citations in one frame."
 \addtocounter{footnote}{-1}
 endsnippet
 
-snippet footcountadd
+snippet footcountadd "increase footnote count by one"
 \addtocounter{footnote}{1}
 endsnippet
 
-snippet ffct
+snippet fnt "footnotetext. Add foot note citation text to footnotemark."
+\footnotetext{$1}$0
+endsnippet
+
+snippet fnct "footnotetext a citation. Add foot note citation text to footnotemark."
 \footnotetext{\fullcite{$1}}$0
 endsnippet
