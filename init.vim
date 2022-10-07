@@ -103,8 +103,6 @@ vnoremap <leader>s y:%s/\V<C-R>=escape(@",'/\')<CR>//gc<Left><Left><Left>
 nnoremap <leader>s yiw:%s/\<<C-R>"\>//gc<Left><Left><Left>
 
 " navigate through buffers
-" nnoremap <A-Tab> :bnext<CR>
-" nnoremap <S-Tab> :bprev<CR>
 nnoremap ZX :bdel<CR>
 
 " navigate through splits

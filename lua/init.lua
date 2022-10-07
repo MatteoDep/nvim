@@ -40,17 +40,19 @@ require("harpoon").setup({
 })
 
 local function harpoon_add(bufname)
-    local function f()
-      require('harpoon.mark').add_file(bufname)
-    end
-    if pcall(f) then
-      print('Added '..bufname)
+    local exclude = { 'harpoon_menu' }
+    if exclude.bufname ~= nil then
+      local function f()
+        require('harpoon.mark').add_file(bufname)
+      end
+      pcall(f)
     end
 end
 
 vim.api.nvim_create_autocmd({ "BufAdd", "BufEnter" }, {
   callback = function() harpoon_add(vim.fn.expand('<afile>')) end,
 })
+
 map('n', "<A-Tab>", function() require('harpoon.ui').nav_next() end, opts)
 map('n', "<S-Tab>", function() require('harpoon.ui').nav_prev() end, opts)
 map('n', "<A-h>", function() require('harpoon.ui').toggle_quick_menu() end, opts)
@@ -86,7 +88,6 @@ vim.api.nvim_create_autocmd({ "VimEnter" }, {
     vim.cmd("FloatermNew --silent")
     local argc = vim.fn.argc()
     if argc == 0 then
-      -- vim.cmd("lua require('harpoon.ui').toggle_quick_menu()")
       require('harpoon.ui').toggle_quick_menu()
     else
       for i = 0,argc-1,1 do
