@@ -40,13 +40,19 @@ require("harpoon").setup({
 })
 
 local function harpoon_add(bufname)
-    local exclude = { 'harpoon_menu' }
-    if exclude.bufname ~= nil then
-      local function f()
-        require('harpoon.mark').add_file(bufname)
-      end
-      pcall(f)
+  if bufname == "" or bufname == nil then
+    return
+  end
+  local exclude = { 'harpoon', 'term://' }
+  for _, substring in pairs(exclude) do
+    if string.find(bufname, substring) then
+      return
     end
+  end
+  local function f()
+    require('harpoon.mark').add_file(bufname)
+  end
+  pcall(f)
 end
 
 vim.api.nvim_create_autocmd({ "BufAdd", "BufEnter" }, {
