@@ -120,6 +120,12 @@ nnoremap <C-q> :cclose<CR>
 nnoremap <F7> :LspStart<CR>
 nnoremap <F8> :LspStop<CR>
 
+" change in dollar sign
+nnoremap ci$ T$ct$
+nnoremap di$ T$dt$
+nnoremap ca$ F$cf$
+nnoremap da$ F$df$
+
 " tabular
 nmap <leader>a= :Tabularize /=<CR>
 vmap <leader>a= :Tabularize /=<CR>
