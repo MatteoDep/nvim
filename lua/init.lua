@@ -43,7 +43,7 @@ local function harpoon_add(bufname)
   if bufname == "" or bufname == nil then
     return
   end
-  local exclude = { 'harpoon', 'term://' }
+  local exclude = { 'harpoon', 'term://', 'undotree', 'diffwin' }
   for _, substring in pairs(exclude) do
     if string.find(bufname, substring) then
       return
