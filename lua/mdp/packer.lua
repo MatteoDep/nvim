@@ -28,7 +28,17 @@ require('packer').startup(function(use)
 
   use { -- Autocompletion
     'hrsh7th/nvim-cmp',
-    requires = { 'hrsh7th/cmp-nvim-lsp', 'hrsh7th/cmp-buffer', 'hrsh7th/cmp-path', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' },
+    requires = {
+      'hrsh7th/cmp-nvim-lsp',
+      'hrsh7th/cmp-cmdline',
+      'hrsh7th/cmp-buffer',
+      'hrsh7th/cmp-path',
+    },
+  }
+
+  use {
+    'saadparwaiz1/cmp_luasnip',
+    requires = { 'L3MON4D3/LuaSnip' },
   }
 
   use { -- Highlight, edit, and navigate code
@@ -100,6 +110,20 @@ require('packer').startup(function(use)
 
   -- toggleterm
   use {"akinsho/toggleterm.nvim", tag = '*'}
+
+  -- luasnip
+  use({
+    "L3MON4D3/LuaSnip",
+    -- follow latest release.
+    tag = "v<CurrentMajor>.*",
+    -- install jsregexp (optional!:).
+    run = "make install_jsregexp"
+  })
+  
+  use {
+    "rafamadriz/friendly-snippets",
+    requires = { "L3MON4D3/LuaSnip" },
+  }
 
   -- Add custom plugins to packer from ~/.config/nvim/lua/custom/plugins.lua
   local has_plugins, plugins = pcall(require, 'custom.plugins')

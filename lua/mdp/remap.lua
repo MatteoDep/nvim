@@ -35,7 +35,7 @@ vim.keymap.set('n', '<C-j>', '<C-w>j')
 vim.keymap.set('n', '<C-k>', '<C-w>k')
 vim.keymap.set('n', '<C-l>', '<C-w>l')
 
--- move between buffers
+-- move between quickfix
 vim.keymap.set('n', '<C-n>', '<cmd>cnext<CR>zz')
 vim.keymap.set('n', '<C-p>', '<cmd>cprev<CR>zz')
 local ToggleQuickfix = function()
@@ -49,8 +49,8 @@ end
 vim.keymap.set('n', '<C-q>', ToggleQuickfix)
 
 -- move between buffers
-vim.keymap.set('n', 'L', '<cmd>bnext<CR>zz')
-vim.keymap.set('n', 'H', '<cmd>bprev<CR>zz')
+vim.keymap.set('n', 'gj', '<cmd>bnext<CR>zz')
+vim.keymap.set('n', 'gk', '<cmd>bprev<CR>zz')
 vim.keymap.set('n', 'ZX', '<cmd>bdel<CR>')
 
 -- folding
@@ -64,8 +64,6 @@ vim.keymap.set('v', 'K', ":m '>-2<CR>gv=gv")
 -- keep the middle
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
-vim.keymap.set('n', 'n', 'nzzzv')
-vim.keymap.set('n', 'N', 'Nzzzv')
 
 -- stop highlight
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
@@ -75,3 +73,6 @@ vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, {desc = "diagnostic prevous"
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, {desc = "diagnostic next"})
 vim.keymap.set('n', '<leader>sd', require("telescope.builtin").diagnostics, { desc = '[S]earch [D]iagnostics' })
 
+-- search/replace
+vim.keymap.set('v', '<leader>S', [["vy:%s/<C-r>v//g<Left><Left>]])
+vim.keymap.set('n', '<leader>S', [["vyiw:%s/<C-r>v//g<Left><Left>]])
