@@ -48,8 +48,12 @@ end
 --  Add any additional override configuration in the following tables. They will be passed to
 --  the `settings` field of the server config. You must look up that documentation yourself.
 local servers = {
-  -- clangd = {},
-  -- gopls = {},
+  lua_ls = {
+    Lua = {
+      workspace = { checkThirdParty = false },
+      telemetry = { enable = false },
+    },
+  },
   pyright = {
     python = {
       analysis = {
@@ -59,20 +63,13 @@ local servers = {
       },
     },
   },
-  -- rust_analyzer = {},
-  -- tsserver = {},
-
-  sumneko_lua = {
-    Lua = {
-      workspace = { checkThirdParty = false },
-      telemetry = { enable = false },
-    },
-  },
+  csharp_ls = {},
+  tsserver = {},
 }
 
 -- Setup neovim lua configuration
 require('neodev').setup()
---
+
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
