@@ -26,6 +26,6 @@ require('lualine').setup {
     lualine_c = {},
     lualine_x = {},
     lualine_y = {},
-    lualine_z = {},
+    lualine_z = { 'tabs' },
   }
 }
