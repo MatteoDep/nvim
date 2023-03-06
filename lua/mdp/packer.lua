@@ -125,11 +125,7 @@ require('packer').startup(function(use)
     requires = { "L3MON4D3/LuaSnip" },
   }
 
-  -- Add custom plugins to packer from ~/.config/nvim/lua/custom/plugins.lua
-  local has_plugins, plugins = pcall(require, 'custom.plugins')
-  if has_plugins then
-    plugins(use)
-  end
+  use "godlygeek/tabular"
 
   if is_bootstrap then
     require('packer').sync()
