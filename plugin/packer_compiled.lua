@@ -211,6 +211,11 @@ _G.packer_plugins = {
     path = "C:\\Users\\matte\\AppData\\Local\\nvim-data\\site\\pack\\packer\\start\\plenary.nvim",
     url = "https://github.com/nvim-lua/plenary.nvim"
   },
+  tabular = {
+    loaded = true,
+    path = "C:\\Users\\matte\\AppData\\Local\\nvim-data\\site\\pack\\packer\\start\\tabular",
+    url = "https://github.com/godlygeek/tabular"
+  },
   ["telescope-fzf-native.nvim"] = {
     loaded = true,
     path = "C:\\Users\\matte\\AppData\\Local\\nvim-data\\site\\pack\\packer\\start\\telescope-fzf-native.nvim",
