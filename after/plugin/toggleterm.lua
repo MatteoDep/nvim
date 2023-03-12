@@ -3,6 +3,7 @@ require("toggleterm").setup({
   terminal_mappings = true,
   insert_mappings = false,
   direction = 'float',
+  close_on_exit = false,
 })
 
 vim.keymap.set('t', "<A-Space>", [[<C-\><C-n>]])
@@ -17,6 +18,7 @@ local lazygit = Terminal:new(
     on_close = function (_)
       vim.cmd("checktime")
     end,
+    close_on_exit = true,
   })
 
 function LazygitToggle()
