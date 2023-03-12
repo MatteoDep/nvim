@@ -13,9 +13,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 local format_trailing = vim.api.nvim_create_augroup('FormatTrailing', { clear = true })
 vim.api.nvim_create_autocmd('BufWritePre', {
   callback = function ()
-    vim.o.hlsearch = false
-    vim.cmd([[%s/\s*$//]])
-    vim.o.hlsearch = true
+    vim.cmd([[%s/\s\+$//e]])
   end,
   group = format_trailing,
   pattern = '*',
