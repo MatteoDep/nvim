@@ -119,11 +119,8 @@ require('packer').startup(function(use)
     -- install jsregexp (optional!:).
     run = "make install_jsregexp"
   })
-  
-  use {
-    "rafamadriz/friendly-snippets",
-    requires = { "L3MON4D3/LuaSnip" },
-  }
+
+  use "rafamadriz/friendly-snippets"
 
   use "godlygeek/tabular"
 

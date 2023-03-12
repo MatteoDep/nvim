@@ -45,12 +45,15 @@ vim.o.foldexpr = "nvim_treesitter#foldexpr()"
 vim.o.foldlevel = 0
 
 -- Set shell
-vim.o.shell = "pwsh.exe"
-vim.o.shellxquote = ""
-vim.o.shellcmdflag = '-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command '
-vim.o.shellquote = ''
-vim.o.shellpipe = '| Out-File -Encoding UTF8 %s'
-vim.o.shellredir = '| Out-File -Encoding UTF8 %s'
+if vim.fn.has("win32") then
+  vim.o.shell = [["C:/Program Files/Git/bin/sh.exe"]]
+  vim.o.shellcmdflag = '-c'
+  vim.o.shellquote = ''
+  vim.o.shellxescape = '"'
+  vim.o.shellxquote = ''
+  vim.o.shellredir = '>%s 2>&1'
+  vim.o.shellpipe = '2>&1 | tee'
+end
 
 -- highlight search
 vim.o.hlsearch = true
