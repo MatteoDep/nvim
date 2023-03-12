@@ -32,9 +32,17 @@ local ToggleQuickfix = function()
 end
 vim.keymap.set('n', '<C-q>', ToggleQuickfix)
 
--- move between buffers
-vim.keymap.set('n', 'gb', '<cmd>bnext<CR>zz')
+-- handle buffers like tabs
+vim.keymap.set('n', 'gb', function ()
+  if vim.v.count == 0 then
+    vim.cmd("bnext")
+  else
+    vim.cmd("LualineBuffersJump "..vim.v.count)
+  end
+end)
 vim.keymap.set('n', 'gB', '<cmd>bprev<CR>zz')
+
+-- close buffers
 vim.keymap.set('n', 'ZX', '<cmd>bdel<CR>')
 
 -- folding
@@ -63,28 +71,42 @@ vim.keymap.set('x', 'gp', [["_dP]])
 -- substitute with motion
 local M = {}
 
-M.CopytoClipboardCallback = function (_)
-  vim.fn.execute([[normal! `[v`]"+y]])
+M.CopytoClipboardCallback = function (a)
+  if a == "char" then
+    vim.fn.execute([[normal! `[v`]"+y]])
+  elseif a == "line" then
+    vim.fn.execute([[normal! `[V`]"+y]])
+  else
+    vim.fn.execute([[normal! `[\<C-v>`]"+y]])
+  end
   vim.fn.execute([[let @/=@+]])
 end
 
-M.SubstituteCallback = function (_)
-  vim.fn.execute([[normal! `[v`]y]])
-  vim.fn.execute([[let @/=@"]])
+M.SubstituteCallback = function (a)
+  if a == "char" then
+    vim.fn.execute([[normal! `[v`]y]])
+  elseif a == "line" then
+    vim.fn.execute([[normal! `[V`]y]])
+  else
+    vim.fn.execute([[normal! `[\<C-v>`]y]])
+  end
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(':%s/<C-r>"//g<Left><Left>', true, false, true), 'm', true)
 end
 
-vim.keymap.set({'n', 'v'}, 'gs',
+vim.keymap.set('n', 'gs',
   [[<cmd>set opfunc=v:lua.require'mdp.remap'.SubstituteCallback<CR>g@]],
   {desc="Substitute"}
 )
+vim.keymap.set('v', 'gs', [[y:%s/<C-r>"//g<Left><Left>]], {desc="Substitute"})
+
 
 -- system clipboard
-vim.keymap.set({'n', 'v'}, '<leader>y',
+vim.keymap.set('n', '<leader>y',
   [[<cmd>set opfunc=v:lua.require'mdp.remap'.CopytoClipboardCallback<CR>g@]],
-  {desc="Substitute"}
+  {desc="Yank to system clipboard"}
 )
-vim.keymap.set({ 'n', 'v' }, '<leader>p', [["+p]])
-vim.keymap.set({ 'n', 'v' }, '<leader>P', [["+P]])
+vim.keymap.set('v', '<leader>y', [["+y]], {desc="Yank to system clipboard"})
+vim.keymap.set({ 'n', 'v' }, '<leader>p', [["+p]], {desc="Paste system clipboard"})
+vim.keymap.set({ 'n', 'v' }, '<leader>P', [["+P]], {desc="Paste system clipboard"})
 
 return M
