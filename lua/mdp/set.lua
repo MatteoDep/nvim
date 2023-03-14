@@ -42,11 +42,11 @@ vim.o.completeopt = 'menuone,noselect'
 -- Set folding method to treesitter
 vim.o.foldmethod = "expr"
 vim.o.foldexpr = "nvim_treesitter#foldexpr()"
-vim.o.foldlevel = 0
+vim.o.foldlevel = 1000
 
 -- Set shell
 if vim.fn.has("win32") then
-  vim.o.shell = [["C:/Program Files/Git/bin/sh.exe"]]
+  vim.o.shell = [["C:/Program Files/Git/bin/bash.exe"]]
   vim.o.shellcmdflag = '-c'
   vim.o.shellquote = ''
   vim.o.shellxescape = '"'
