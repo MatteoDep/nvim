@@ -90,14 +90,15 @@ M.SubstituteCallback = function (a)
   else
     vim.fn.execute([[normal! `[\<C-v>`]y]])
   end
-  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(':%s/<C-r>"//g<Left><Left>', true, false, true), 'm', true)
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes([[:%s/\V<C-r>"//g<Left><Left>]], true, false, true), 'm', true)
 end
 
 vim.keymap.set('n', 'gs',
   [[<cmd>set opfunc=v:lua.require'mdp.remap'.SubstituteCallback<CR>g@]],
   {desc="Substitute"}
 )
-vim.keymap.set('v', 'gs', [[y:%s/<C-r>"//g<Left><Left>]], {desc="Substitute"})
+vim.keymap.set('n', 'gss', [[yy:%s/\V<C-r>"//g<Left><Left>]], {desc="Substitute"})
+vim.keymap.set('v', 'gs', [[y:%s/\V<C-r>"//g<Left><Left>]], {desc="Substitute"})
 
 
 -- system clipboard
@@ -105,6 +106,7 @@ vim.keymap.set('n', '<leader>y',
   [[<cmd>set opfunc=v:lua.require'mdp.remap'.CopytoClipboardCallback<CR>g@]],
   {desc="Yank to system clipboard"}
 )
+vim.keymap.set('n', '<leader>yy', [["+yy]], {desc="Yank to system clipboard"})
 vim.keymap.set('v', '<leader>y', [["+y]], {desc="Yank to system clipboard"})
 vim.keymap.set({ 'n', 'v' }, '<leader>p', [["+p]], {desc="Paste system clipboard"})
 vim.keymap.set({ 'n', 'v' }, '<leader>P', [["+P]], {desc="Paste system clipboard"})
