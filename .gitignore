@@ -2,3 +2,4 @@ nvim-pyenv*
 plugged*
 .netrwhist
 main.shada*
+plugin/packer_compiled.lua
