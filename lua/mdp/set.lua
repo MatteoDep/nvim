@@ -45,7 +45,7 @@ vim.o.foldexpr = "nvim_treesitter#foldexpr()"
 vim.o.foldlevel = 1000
 
 -- Set shell
-if vim.fn.has("win32") then
+if vim.fn.has("win32") == 1 then
   vim.o.shell = [["C:/Program Files/Git/bin/bash.exe"]]
   vim.o.shellcmdflag = '-c'
   vim.o.shellquote = ''
