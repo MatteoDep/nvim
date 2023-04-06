@@ -57,3 +57,6 @@ end
 
 -- highlight search
 vim.o.hlsearch = true
+
+-- line and column in files
+vim.cmd("set isfname-=:")
