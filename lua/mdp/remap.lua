@@ -69,32 +69,8 @@ vim.keymap.set('n', '<leader>sd', require("telescope.builtin").diagnostics, { de
 vim.keymap.set('x', 'gp', [["_dP]])
 
 -- substitute with motion
-local M = {}
-
-M.CopytoClipboardCallback = function (a)
-  if a == "char" then
-    vim.fn.execute([[normal! `[v`]"+y]])
-  elseif a == "line" then
-    vim.fn.execute([[normal! `[V`]"+y]])
-  else
-    vim.fn.execute([[normal! `[\<C-v>`]"+y]])
-  end
-  vim.fn.execute([[let @/=@+]])
-end
-
-M.SubstituteCallback = function (a)
-  if a == "char" then
-    vim.fn.execute([[normal! `[v`]y]])
-  elseif a == "line" then
-    vim.fn.execute([[normal! `[V`]y]])
-  else
-    vim.fn.execute([[normal! `[\<C-v>`]y]])
-  end
-  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes([[:%s/\V<C-r>"//g<Left><Left>]], true, false, true), 'm', true)
-end
-
 vim.keymap.set('n', 'gs',
-  [[<cmd>set opfunc=v:lua.require'mdp.remap'.SubstituteCallback<CR>g@]],
+  [[<cmd>set opfunc=v:lua.require'mdp.util'.SubstituteCallback<CR>g@]],
   {desc="Substitute"}
 )
 vim.keymap.set('n', 'gss', [[yy:%s/\V<C-r>"//g<Left><Left>]], {desc="Substitute"})
@@ -103,12 +79,10 @@ vim.keymap.set('v', 'gs', [[y:%s/\V<C-r>"//g<Left><Left>]], {desc="Substitute"})
 
 -- system clipboard
 vim.keymap.set('n', '<leader>y',
-  [[<cmd>set opfunc=v:lua.require'mdp.remap'.CopytoClipboardCallback<CR>g@]],
+  [[<cmd>set opfunc=v:lua.require'mdp.util'.CopytoClipboardCallback<CR>g@]],
   {desc="Yank to system clipboard"}
 )
 vim.keymap.set('n', '<leader>yy', [["+yy]], {desc="Yank to system clipboard"})
 vim.keymap.set('v', '<leader>y', [["+y]], {desc="Yank to system clipboard"})
 vim.keymap.set({ 'n', 'v' }, '<leader>p', [["+p]], {desc="Paste system clipboard"})
 vim.keymap.set({ 'n', 'v' }, '<leader>P', [["+P]], {desc="Paste system clipboard"})
-
-return M
