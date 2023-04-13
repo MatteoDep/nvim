@@ -36,11 +36,12 @@ vim.keymap.set('n', '<C-q>', ToggleQuickfix)
 vim.keymap.set('n', 'gb', function ()
   if vim.v.count == 0 then
     vim.cmd("bnext")
+    vim.cmd("normal! zz")
   else
     vim.cmd("LualineBuffersJump "..vim.v.count)
   end
-end)
-vim.keymap.set('n', 'gB', '<cmd>bprev<CR>zz')
+end, {desc="next/goto <count> [B]uffer"})
+vim.keymap.set('n', 'gB', '<cmd>bprev<CR>zz', {desc="previous [B]uffer"})
 
 -- close buffers
 vim.keymap.set('n', 'ZX', '<cmd>bdel<CR>')
