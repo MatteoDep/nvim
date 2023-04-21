@@ -77,7 +77,6 @@ vim.keymap.set('n', 'gs',
 vim.keymap.set('n', 'gss', [[yy:%s/\V<C-r>"//g<Left><Left>]], {desc="Substitute"})
 vim.keymap.set('v', 'gs', [[y:%s/\V<C-r>"//g<Left><Left>]], {desc="Substitute"})
 
-
 -- system clipboard
 vim.keymap.set('n', '<leader>y',
   [[<cmd>set opfunc=v:lua.require'mdp.util'.CopytoClipboardCallback<CR>g@]],
@@ -87,3 +86,7 @@ vim.keymap.set('n', '<leader>yy', [["+yy]], {desc="Yank to system clipboard"})
 vim.keymap.set('v', '<leader>y', [["+y]], {desc="Yank to system clipboard"})
 vim.keymap.set({ 'n', 'v' }, '<leader>p', [["+p]], {desc="Paste system clipboard"})
 vim.keymap.set({ 'n', 'v' }, '<leader>P', [["+P]], {desc="Paste system clipboard"})
+
+-- go to file
+vim.keymap.set({ 'n', 'v' }, 'gf', 'gfzz', {desc="Go to file"})
+vim.keymap.set({ 'n', 'v' }, 'gF', 'gFzz', {desc="Go to file:line"})
