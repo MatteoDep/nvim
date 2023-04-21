@@ -10,6 +10,10 @@ require('gitsigns').setup {
   },
 }
 
-vim.keymap.set('n', '<leader>gg', '<cmd>Gitsigns setqflist<CR>', {desc="[G]it changes qflist"})
-vim.keymap.set('n', '<leader>gn', '<cmd>Gitsigns next_hunk<CR>', {desc="[G]it changes next"})
-vim.keymap.set('n', '<leader>gp', '<cmd>Gitsigns prev_hunk<CR>', {desc="[G]it changes prev"})
+vim.keymap.set('n', '<leader>gl', '<cmd>Gitsigns setqflist<CR>', {desc="[G]it changes qf[L]ist"})
+vim.keymap.set('n', '<leader>gn', '<cmd>Gitsigns next_hunk<CR>', {desc="[G]it changes [N]ext"})
+vim.keymap.set('n', '<leader>gp', '<cmd>Gitsigns prev_hunk<CR>', {desc="[G]it changes [P]rev"})
+vim.keymap.set('n', '<leader>gb', '<cmd>Gitsigns toggle_current_line_blame<CR>', {desc="[G]it [B]lame"})
+vim.keymap.set('n', '<leader>gcb', ':Gitsigns change_base ', {desc="[G]it [C]hange [B]ase"})
+vim.keymap.set('n', '<leader>gr', '<cmd>Gitsigns reset_hunk<CR>', {desc="[G]it [R]eset hunk"})
+vim.keymap.set('n', '<leader>gd', '<cmd>Gitsigns diffthis<CR>', {desc="[G]it [D]iff current file"})
