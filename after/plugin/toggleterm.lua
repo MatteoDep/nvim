@@ -11,10 +11,10 @@ require("toggleterm").setup({
     vim.cmd("checktime")
   end,
   on_open = function (_)
-    for _, cmd in ipairs({"gf", "gF"}) do
-      vim.keymap.set("n", cmd, function ()
-        require'mdp.util'.RunOutsideWindow(cmd)
-      end, {noremap = true, silent = true, desc="run outside window '"..cmd.."'", buffer=0})
+    for cmd, desc in pairs({gf="Go to file", gF="Go to file:line"}) do
+      vim.keymap.set('n', cmd, function ()
+        require'mdp.util'.RunOutsideWindow(cmd.."zz")
+      end, {noremap = true, silent = true, desc=desc, buffer=0})
     end
   end,
 })
