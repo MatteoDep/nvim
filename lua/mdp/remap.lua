@@ -67,7 +67,7 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next, {desc = "diagnostic next"})
 vim.keymap.set('n', '<leader>sd', require("telescope.builtin").diagnostics, { desc = '[S]earch [D]iagnostics' })
 
 -- pasting without changing register
-vim.keymap.set('x', 'gp', [["_dP]])
+vim.keymap.set('x', 'gp', [["_c<C-r>"<Esc>]])
 
 -- substitute with motion
 vim.keymap.set('n', 'gs',
