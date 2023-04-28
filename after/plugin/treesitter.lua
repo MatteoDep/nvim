@@ -2,17 +2,17 @@
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { 'c', 'cpp', 'c_sharp', 'go', 'lua', 'python', 'rust', 'typescript', 'help', 'vim' },
+  ensure_installed = { 'c', 'cpp', 'c_sharp', 'go', 'lua', 'python', 'rust', 'typescript', 'tsx', 'javascript', 'help', 'vim' },
 
   highlight = { enable = true },
-  indent = { enable = true, disable = { 'python' } },
+  indent = { enable = true },
   incremental_selection = {
     enable = true,
     keymaps = {
-      init_selection = '<c-space>',
-      node_incremental = '<c-space>',
-      scope_incremental = '<c-s>',
-      node_decremental = '<c-backspace>',
+      init_selection = '<space>v',
+      node_incremental = '<space>n',
+      scope_incremental = '<space>a',
+      node_decremental = '<space>N',
     },
   },
   textobjects = {
@@ -34,19 +34,19 @@ require('nvim-treesitter.configs').setup {
       set_jumps = true, -- whether to set jumps in the jumplist
       goto_next_start = {
         [']m'] = '@function.outer',
-        [']]'] = '@class.outer',
+        [']c'] = '@class.outer',
       },
       goto_next_end = {
         [']M'] = '@function.outer',
-        [']['] = '@class.outer',
+        [']C'] = '@class.outer',
       },
       goto_previous_start = {
         ['[m'] = '@function.outer',
-        ['[['] = '@class.outer',
+        ['[c'] = '@class.outer',
       },
       goto_previous_end = {
         ['[M'] = '@function.outer',
-        ['[]'] = '@class.outer',
+        ['[C'] = '@class.outer',
       },
     },
     swap = {
