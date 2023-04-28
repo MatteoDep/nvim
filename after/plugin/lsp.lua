@@ -13,7 +13,7 @@ local on_attach = function(_, bufnr)
   -- See `:help K` for why this keymap
   vim.keymap.set('n', 'K', vim.lsp.buf.hover, { buffer=bufnr, desc='Hover Documentation' })
   vim.keymap.set('n', 'gh', vim.lsp.buf.signature_help, { buffer=bufnr, desc='Signature Documentation' })
-  vim.keymap.set('i', '<C-S-k>', vim.lsp.buf.signature_help, { buffer=bufnr, desc='Signature Documentation' })
+  vim.keymap.set('i', '<C-h>', vim.lsp.buf.signature_help, { buffer=bufnr, desc='Signature Documentation' })
 
   -- Lesser used LSP functionality
   vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, { buffer=bufnr, desc='[G]oto [D]eclaration' })
