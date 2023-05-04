@@ -25,6 +25,7 @@ require('packer').startup(function(use)
       'folke/neodev.nvim',
     },
   }
+  use 'jose-elias-alvarez/null-ls.nvim'
 
   use { -- Autocompletion
     'hrsh7th/nvim-cmp',
