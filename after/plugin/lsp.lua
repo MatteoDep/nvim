@@ -83,3 +83,13 @@ mason_lspconfig.setup_handlers {
 
 -- Turn on lsp status information
 require('fidget').setup()
+
+-- null ls
+local null_ls = require("null-ls")
+
+null_ls.setup({
+    sources = {
+        null_ls.builtins.formatting.black.with({ extra_args = { "-l", 120 } }),
+        null_ls.builtins.diagnostics.flake8.with({ extra_args = { "--max-line-length", 120 } }),
+    },
+})
