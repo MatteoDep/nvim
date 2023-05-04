@@ -53,7 +53,7 @@ if vim.fn.has("win32") == 1 then
   vim.o.shellxquote = ''
   vim.o.shellredir = '>%s 2>&1'
   vim.o.shellpipe = '2>&1 | tee'
-  vim.o.shellslash = true
+  -- vim.o.shellslash = true
 end
 
 -- highlight search
