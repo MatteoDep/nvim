@@ -52,6 +52,7 @@ local servers = {
   },
   csharp_ls = {},
   tsserver = {},
+  bashls = {},
 }
 
 -- Setup neovim lua configuration
