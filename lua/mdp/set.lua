@@ -1,5 +1,4 @@
--- [[ Setting options ]]
--- See `:help vim.o`
+local M = {}
 
 -- Set relative numbers
 vim.opt.relativenumber = true
@@ -33,8 +32,9 @@ vim.o.updatetime = 250
 vim.o.signcolumn = 'yes'
 
 -- Set colorscheme
-vim.o.termguicolors = true
-vim.cmd("colorscheme onedark")
+M.colorscheme = "onedark"
+M.theme = "dark"
+M.lualine_theme = "one"..M.theme
 
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
@@ -61,3 +61,5 @@ vim.o.hlsearch = true
 
 -- line and column in files
 vim.cmd("set isfname-=:")
+
+return M
