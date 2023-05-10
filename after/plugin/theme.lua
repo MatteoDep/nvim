@@ -1,9 +1,26 @@
--- Set lualine as statusline
--- See `:help lualine.txt`
+-- theme settings
+local settings = require('mdp.set')
+
+vim.o.termguicolors = true
+vim.o.background = settings.theme
+
+if settings.colorscheme == 'onedark' then
+    local onedark = require('onedark')
+
+    onedark.setup  {
+        style = settings.theme,
+        transparent = true,
+    }
+    onedark.load()
+else
+    vim.cmd('colorscheme '..settings.colorscheme)
+end
+
+-- lualine
 require('lualine').setup {
   options = {
     icons_enabled = false,
-    theme = 'onedark',
+    theme = settings.lualine_theme,
     component_separators = '|',
     section_separators = '',
   },
