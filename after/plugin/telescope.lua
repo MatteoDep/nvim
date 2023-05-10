@@ -1,5 +1,19 @@
--- [[ Configure Telescope ]]
--- See `:help telescope` and `:help telescope.setup()`
+local global_fdignore
+if vim.fn.has("win32") == 1 then
+  global_fdignore = vim.fn.expand("$HOME").."/AppData/Roaming/fd/ignore"
+else
+  global_fdignore = "~/.config/fd/ignore"
+end
+local f = io.open(global_fdignore, "rb")
+local fd_cmd = { "fd", "-IH" }
+if f then
+  f:close()
+  for line in io.lines(global_fdignore) do
+    fd_cmd[#fd_cmd+1] = "-E"
+    fd_cmd[#fd_cmd+1] = line
+  end
+end
+
 require('telescope').setup {
   defaults = {
     mappings = {
@@ -16,8 +30,7 @@ require('telescope').setup {
   },
   pickers = {
     find_files = {
-      -- find_command = { "fd", "-IH", "-E", ".git", "-E", "venv" },
-      find_command = { "fd", "-H" },
+      find_command = fd_cmd,
     },
   },
 }
