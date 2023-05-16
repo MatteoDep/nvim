@@ -21,7 +21,7 @@ require("toggleterm").setup({
 
 vim.keymap.set('t', "<A-Space>", [[<C-\><C-n>]])
 vim.keymap.set('t', "<A-Enter>", [[<C-\><C-n>]])
-vim.keymap.set('v', "<A-t>", [[:ToggleTermSendVisualLines ]], {desc = "Send to terminal <number>"})
+vim.keymap.set('v', "<Space>t", [[:ToggleTermSendVisualLines ]], {desc = "Send to terminal <number>"})
 
 local Terminal  = require('toggleterm.terminal').Terminal
 local lazygit = Terminal:new(
