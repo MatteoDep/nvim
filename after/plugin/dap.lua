@@ -1,7 +1,9 @@
 local dap = require('dap')
 local dapui = require("dapui")
+
+vim.fn.sign_define('DapBreakpoint', {text='🛑', texthl='', linehl='', numhl=''})
 dapui.setup()
-require("nvim-dap-virtual-text").setup()
+require("nvim-dap-virtual-text").setup({})
 
 dap.listeners.after.event_initialized["dapui_config"] = function()
   dapui.open()
@@ -20,6 +22,7 @@ vim.keymap.set('n', '<leader>dl', dap.step_into, {desc="[d]ap step into"})
 vim.keymap.set('n', '<leader>dj', dap.step_over, {desc="[d]ap step over"})
 vim.keymap.set('n', '<leader>dh', dap.step_out, {desc="[d]ap step out"})
 vim.keymap.set('n', '<leader>dr', dap.repl.open, {desc="[d]ap repl open"})
+vim.keymap.set('n', '<leader>du', dapui.toggle, {desc="[d]ap ui toggle"})
 
 dap.adapters.coreclr = {
   type = 'executable',
@@ -33,7 +36,11 @@ dap.configurations.cs = {
     name = "launch - netcoredbg",
     request = "launch",
     program = function()
-        return vim.fn.input('Path to dll: ', vim.fn.getcwd() .. '/bin/Debug/', "file")
+        return vim.fn.input({
+          prompt='Path to dll: ',
+          default=vim.fn.getcwd() .. '/bin/Debug/',
+          completion='file'
+        })
     end,
   },
 }
