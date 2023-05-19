@@ -1,7 +1,12 @@
 local dap = require('dap')
 local dapui = require("dapui")
 
-vim.fn.sign_define('DapBreakpoint', {text='🛑', texthl='', linehl='', numhl=''})
+vim.fn.sign_define('DapBreakpoint', {text=''})
+vim.fn.sign_define('DapBreakpointCondition', {text=''})
+vim.fn.sign_define('DapLogPoint', {text=''})
+vim.fn.sign_define('DapStopped', {text='→'})
+vim.fn.sign_define('DapBreakpointRejected', {text=''})
+
 dapui.setup()
 require("nvim-dap-virtual-text").setup({})
 
@@ -17,16 +22,30 @@ end
 
 vim.keymap.set('n', '<leader>dc', dap.continue, {desc="[d]ap [c]ontinue"})
 vim.keymap.set('n', '<leader>db', dap.toggle_breakpoint, {desc="[d]ap toggle [b]reakpoint"})
-vim.keymap.set('n', '<leader>dB', function () dap.set_breakpoint(vim.fn.input("Breakpoint condition: ")) end, {desc="[d]ap conditional [B]reakpoint"})
+vim.keymap.set('n', '<leader>dB', function()
+  dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
+end, { desc = "[d]ap conditional [B]reakpoint" })
+vim.keymap.set('n', '<leader>dl', function()
+  dap.set_breakpoint(nil, nil, vim.fn.input("Log point message: "))
+end, { desc = "[d]ap [L]og point" })
 vim.keymap.set('n', '<leader>dl', dap.step_into, {desc="[d]ap step into"})
 vim.keymap.set('n', '<leader>dj', dap.step_over, {desc="[d]ap step over"})
 vim.keymap.set('n', '<leader>dh', dap.step_out, {desc="[d]ap step out"})
 vim.keymap.set('n', '<leader>dr', dap.repl.open, {desc="[d]ap repl open"})
 vim.keymap.set('n', '<leader>du', dapui.toggle, {desc="[d]ap ui toggle"})
 
-dap.adapters.coreclr = {
+-- variables
+local bindir = "bin"
+local ext = ""
+if vim.fn.has("win32") == 1 then
+  bindir = "Scripts"
+  ext = ".exe"
+end
+
+-- csharp
+dap.adapters.cs = {
   type = 'executable',
-  command = [[C:\Users\matte\AppData\Local\nvim-data\mason\packages\netcoredbg\netcoredbg\netcoredbg.exe]],
+  command = vim.fn.stdpath('data').."/mason/packages/netcoredbg/netcoredbg/netcoredbg"..ext,
   args = {'--interpreter=vscode'}
 }
 
