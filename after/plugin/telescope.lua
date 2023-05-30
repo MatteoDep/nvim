@@ -2,7 +2,7 @@ local global_fdignore
 if vim.fn.has("win32") == 1 then
   global_fdignore = vim.fn.expand("$HOME").."/AppData/Roaming/fd/ignore"
 else
-  global_fdignore = "~/.config/fd/ignore"
+  global_fdignore = vim.fn.expand("$HOME").."/.config/fd/ignore"
 end
 local f = io.open(global_fdignore, "rb")
 local fd_cmd = { "fd", "-IH" }
