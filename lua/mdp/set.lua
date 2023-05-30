@@ -44,6 +44,16 @@ vim.o.foldmethod = "expr"
 vim.o.foldexpr = "nvim_treesitter#foldexpr()"
 vim.o.foldlevel = 1000
 
+local iswsl = function()
+  local s
+  local f = assert(io.popen("uname -r", "r"))
+  s = assert(f:read("*a"))
+  f:close()
+  s = string.lower(s)
+  s = string.find(s, "wsl")
+  return s ~= nil
+end
+
 -- Set shell
 if vim.fn.has("win32") == 1 then
   vim.o.shell = [["C:/Program Files/Git/bin/bash.exe"]]
@@ -54,6 +64,21 @@ if vim.fn.has("win32") == 1 then
   vim.o.shellredir = '>%s 2>&1'
   vim.o.shellpipe = '2>&1 | tee'
   vim.o.shellslash = true
+elseif iswsl() then
+  vim.cmd([[
+    let g:clipboard = {
+                \   'name': 'WslClipboard',
+                \   'copy': {
+                \      '+': 'clip.exe',
+                \      '*': 'clip.exe',
+                \    },
+                \   'paste': {
+                \      '+': 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+                \      '*': 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+                \   },
+                \   'cache_enabled': 0,
+                \ }
+  ]])
 end
 
 -- highlight search
