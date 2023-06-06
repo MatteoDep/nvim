@@ -25,6 +25,13 @@ require("nvim-tree").setup({
     modified = {
         enable = true,
     },
+    git = {
+        enable = true,
+        ignore = false,
+        show_on_dirs = true,
+        show_on_open_dirs = true,
+        timeout = 400,
+    },
 })
 
 vim.keymap.set("n", "<leader>e", vim.cmd.NvimTreeToggle, {desc = "[E]xplore with nvim-tree"})

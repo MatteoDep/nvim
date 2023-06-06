@@ -9,7 +9,7 @@ if settings.colorscheme == 'onedark' then
 
     onedark.setup  {
         style = settings.theme,
-        transparent = true,
+        transparent = false,
     }
     onedark.load()
 else
