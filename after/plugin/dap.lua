@@ -84,7 +84,7 @@ end
 dap.adapters.python = function(cb, config)
   if config.request == 'attach' then
     ---@diagnostic disable-next-line: undefined-field
-    local port = (config.connect or config).port or 5005
+    local port = (config.connect or config).port or 5678
     ---@diagnostic disable-next-line: undefined-field
     local host = (config.connect or config).host or '127.0.0.1'
     cb({
