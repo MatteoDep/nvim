@@ -33,15 +33,24 @@ end
 vim.keymap.set('n', '<C-q>', ToggleQuickfix)
 
 -- buffers
-vim.keymap.set('n', 'gb', function ()
+local function goto_buffer()
   if vim.v.count == 0 then
     vim.cmd("bnext")
     vim.cmd("normal! zz")
   else
     vim.cmd("LualineBuffersJump "..vim.v.count)
+    vim.cmd("normal! zz")
   end
-end, {desc="next/goto <count> [B]uffer"})
+end
+vim.keymap.set('n', 'gb', goto_buffer, {desc="next/goto <count> [B]uffer"})
 vim.keymap.set('n', 'gB', '<cmd>bprev<CR>zz', {desc="previous [B]uffer"})
+vim.keymap.set('n', '<A-n>', '<cmd>bnext<CR>zz', {desc="next/goto <count> [B]uffer"})
+vim.keymap.set('n', '<A-p>', '<cmd>bprev<CR>zz', {desc="previous [B]uffer"})
+for i = 0, 9, 1 do
+  local key = (i % 10) + 1
+  vim.keymap.set('n', '<A-'..key..'>', '<cmd>LualineBuffersJump '..key..'<CR>zz', {desc="previous [B]uffer"})
+end
+
 vim.keymap.set('n', 'ZX', '<cmd>bdel<CR>')
 
 -- folding
