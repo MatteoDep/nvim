@@ -1,7 +1,3 @@
--- [[ Basic Keymaps ]]
--- Set <space> as the leader key
--- See `:help mapleader`
---  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
@@ -13,13 +9,17 @@ vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>')
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
--- move between windows
+-- windows
 vim.keymap.set('n', '<C-h>', '<C-w>h')
 vim.keymap.set('n', '<C-j>', '<C-w>j')
 vim.keymap.set('n', '<C-k>', '<C-w>k')
 vim.keymap.set('n', '<C-l>', '<C-w>l')
+vim.keymap.set('n', '<A-->', '<C-w>-')
+vim.keymap.set('n', '<A-=>', '<C-w>+')
+vim.keymap.set('n', '<A-,>', '<C-w><')
+vim.keymap.set('n', '<A-.>', '<C-w>>')
 
--- move between quickfix
+-- quickfix
 vim.keymap.set('n', '<C-n>', '<cmd>cnext<CR>zz')
 vim.keymap.set('n', '<C-p>', '<cmd>cprev<CR>zz')
 local ToggleQuickfix = function()
@@ -32,7 +32,7 @@ local ToggleQuickfix = function()
 end
 vim.keymap.set('n', '<C-q>', ToggleQuickfix)
 
--- handle buffers like tabs
+-- buffers
 vim.keymap.set('n', 'gb', function ()
   if vim.v.count == 0 then
     vim.cmd("bnext")
@@ -42,8 +42,6 @@ vim.keymap.set('n', 'gb', function ()
   end
 end, {desc="next/goto <count> [B]uffer"})
 vim.keymap.set('n', 'gB', '<cmd>bprev<CR>zz', {desc="previous [B]uffer"})
-
--- close buffers
 vim.keymap.set('n', 'ZX', '<cmd>bdel<CR>')
 
 -- folding
