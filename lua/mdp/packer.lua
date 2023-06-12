@@ -125,6 +125,8 @@ require('packer').startup(function(use)
 
   use "godlygeek/tabular"
 
+  use "tpope/vim-obsession"
+
   if is_bootstrap then
     require('packer').sync()
   end
