@@ -97,3 +97,11 @@ vim.keymap.set({ 'n', 'v' }, '<leader>P', [["+P]], {desc="Paste system clipboard
 -- go to file
 vim.keymap.set({ 'n', 'v' }, 'gf', 'gfzz', {desc="Go to file"})
 vim.keymap.set({ 'n', 'v' }, 'gF', 'gFzz', {desc="Go to file:line"})
+
+-- tabularize
+for _, symbol in pairs({'=', '|'}) do
+  vim.keymap.set({ 'n', 'v' }, '<leader>a'..symbol, '<cmd>Tab /'..symbol..'<CR>', {desc="[A]lign ("..symbol..")."})
+end
+for _, symbol in pairs({':'}) do
+  vim.keymap.set({ 'n', 'v' }, '<leader>a'..symbol, '<cmd>Tab /'..symbol..'\zs<CR>', {desc="[A]lign ("..symbol..")."})
+end
