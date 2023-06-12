@@ -18,11 +18,9 @@ require('telescope').setup {
   defaults = {
     mappings = {
       i = {
-        ['<C-u>'] = false,
-        ['<C-d>'] = false,
         ['<C-h>'] = "which_key",
-        ['<Tab>'] = "move_selection_previous",
-        ['<S-Tab>'] = "move_selection_next",
+        ['<C-k>'] = "move_selection_previous",
+        ['<C-j>'] = "move_selection_next",
       },
     },
     path_display = { "truncate" },
