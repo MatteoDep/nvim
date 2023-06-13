@@ -63,6 +63,7 @@ require('lualine').setup {
     lualine_a = {
       {
         'buffers',
+        mode=2,
         max_length = vim.o.columns * 9 / 10,
         symbols = {
           modified = ' ',      -- Text to show when the buffer is modified
