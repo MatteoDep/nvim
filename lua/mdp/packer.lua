@@ -25,7 +25,7 @@ require('packer').startup(function(use)
       'folke/neodev.nvim',
     },
   }
-  use 'jose-elias-alvarez/null-ls.nvim'
+  -- use 'jose-elias-alvarez/null-ls.nvim'
 
   use { -- Autocompletion
     'hrsh7th/nvim-cmp',
@@ -37,6 +37,15 @@ require('packer').startup(function(use)
     },
   }
 
+  -- luasnip
+  use({
+    "L3MON4D3/LuaSnip",
+    -- follow latest release.
+    tag = "v<CurrentMajor>.*",
+    -- install jsregexp (optional!:).
+    run = "make install_jsregexp"
+  })
+
   use {
     'saadparwaiz1/cmp_luasnip',
     requires = { 'L3MON4D3/LuaSnip' },
@@ -44,9 +53,6 @@ require('packer').startup(function(use)
 
   use { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
-    run = function()
-      pcall(require('nvim-treesitter.install').update { with_sync = true })
-    end,
   }
 
   use { -- Additional text objects via treesitter
@@ -111,15 +117,6 @@ require('packer').startup(function(use)
 
   -- toggleterm
   use {"akinsho/toggleterm.nvim", tag = '*'}
-
-  -- luasnip
-  use({
-    "L3MON4D3/LuaSnip",
-    -- follow latest release.
-    tag = "v<CurrentMajor>.*",
-    -- install jsregexp (optional!:).
-    run = "make install_jsregexp"
-  })
 
   use "rafamadriz/friendly-snippets"
 

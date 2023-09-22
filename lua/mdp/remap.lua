@@ -105,3 +105,4 @@ end
 for _, symbol in pairs({':'}) do
   vim.keymap.set({ 'n', 'v' }, '<leader>a'..symbol, '<cmd>Tab /'..symbol..'\zs<CR>', {desc="[A]lign ("..symbol..")."})
 end
+vim.keymap.set({ 'n', 'v' }, '<leader>aa', ':Tab /', {desc="[A]lign prompt."})

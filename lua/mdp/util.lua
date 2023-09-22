@@ -31,4 +31,20 @@ M.SubstituteCallback = function (a)
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes([[:%s/\V<C-r>"//g<Left><Left>]], true, false, true), 'm', true)
 end
 
+function M.FormatRangeCallback()
+  local old_func = vim.go.operatorfunc
+  _G.op_func_formatting = function()
+    local opts = {
+      range = {
+        ['start'] = vim.api.nvim_buf_get_mark(0, '['),
+        ['end'] = vim.api.nvim_buf_get_mark(0, ']'),
+      }
+    }
+    vim.lsp.buf.format(opts)
+    vim.go.operatorfunc = old_func
+    _G.op_func_formatting = nil
+  end
+  vim.go.operatorfunc = 'v:lua.op_func_formatting'
+end
+
 return M

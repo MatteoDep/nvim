@@ -23,7 +23,7 @@ local on_attach = function(_, bufnr)
     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   end, { buffer=bufnr, desc='[W]orkspace [L]ist Folders' })
 
-  vim.keymap.set({'n', 'v'}, '<leader>f', ":lua vim.lsp.buf.format({ timeout_ms = 5000 })<CR>", { silent=true, desc='Format current buffer with LSP' })
+  vim.keymap.set({'n', 'v'}, '<leader>f', vim.lsp.buf.format, { silent=true, desc='Format current buffer with LSP' })
 end
 
 -- Enable the following language servers
@@ -44,6 +44,7 @@ local servers = {
         typeCheckingMode = "off",
         autoSearchPaths = true,
         useLibraryCodeForTypes = true,
+        reportUnusedVariables = false,
       },
     },
   },
@@ -51,6 +52,8 @@ local servers = {
   tsserver = {},
   bashls = {},
   jsonls = {},
+  gopls = {},
+  ruff_lsp = {},
 }
 
 -- Setup neovim lua configuration
@@ -83,12 +86,12 @@ mason_lspconfig.setup_handlers {
 require('fidget').setup()
 
 -- null ls
-local null_ls = require("null-ls")
-
-null_ls.setup({
-    sources = {
-        null_ls.builtins.formatting.black.with({ extra_args = { "--fast", "-l", 120 } }),
-        null_ls.builtins.diagnostics.flake8.with({ extra_args = { "--max-line-length", 120 } }),
-        null_ls.builtins.diagnostics.mypy,
-    },
-})
+-- local null_ls = require("null-ls")
+--
+-- null_ls.setup({
+--     sources = {
+--         null_ls.builtins.formatting.black.with({ extra_args = { "--fast", "-l", 120 } }),
+--         null_ls.builtins.diagnostics.flake8.with({ extra_args = { "--max-line-length", 120 } }),
+--         null_ls.builtins.diagnostics.mypy,
+--     },
+-- })
