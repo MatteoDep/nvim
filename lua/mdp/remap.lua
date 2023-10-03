@@ -51,7 +51,8 @@ for i = 0, 9, 1 do
   vim.keymap.set('n', '<A-'..key..'>', '<cmd>LualineBuffersJump '..key..'<CR>zz', {desc="previous [B]uffer"})
 end
 
-vim.keymap.set('n', 'ZX', '<cmd>bdel<CR>')
+vim.keymap.set('n', 'XX', '<cmd>bdel<CR>')
+vim.keymap.set('n', 'XQ', '<cmd>bdel!<CR>')
 
 -- folding
 vim.keymap.set('n', '<Space><Space>', 'za')
