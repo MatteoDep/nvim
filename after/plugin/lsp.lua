@@ -54,6 +54,8 @@ local servers = {
   jsonls = {},
   gopls = {},
   ruff_lsp = {},
+  cssls = {},
+  html = {},
 }
 
 -- Setup neovim lua configuration
