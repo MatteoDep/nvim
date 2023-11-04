@@ -80,6 +80,11 @@ elseif iswsl() then
   ]])
 end
 
+-- gui
+if vim.g.neovide then
+  vim.g.neovide_scale_factor = 0.7
+end
+
 -- highlight search
 vim.o.hlsearch = true
 
