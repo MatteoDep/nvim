@@ -56,14 +56,13 @@ end
 
 -- Set shell
 if vim.fn.has("win32") == 1 then
-  vim.o.shell = [["C:/Program Files/Git/bin/bash.exe"]]
+  vim.o.shell = [["C:\Program Files\Git\usr\bin\bash.exe"]]
   vim.o.shellcmdflag = '-c'
   vim.o.shellquote = ''
   vim.o.shellxescape = '"'
   vim.o.shellxquote = ''
   vim.o.shellredir = '>%s 2>&1'
   vim.o.shellpipe = '2>&1 | tee'
-  vim.o.shellslash = true
 elseif iswsl() then
   vim.cmd([[
     let g:clipboard = {
