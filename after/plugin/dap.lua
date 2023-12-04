@@ -72,7 +72,7 @@ dap.configurations.cs[#dap.configurations.cs+1] = {
 
 local python_path = function()
   local s
-  local f = assert(io.popen("where python", "r"))
+  local f = assert(io.popen("which python", "r"))
   s = assert(f:read("*a"))
   f:close()
   s = string.gsub(s, '^%s+', '')
@@ -113,7 +113,24 @@ end
 dap.configurations.python[#dap.configurations.python+1] = {
   type = 'python',
   request = 'launch',
-  name = "launch file",
+  name = "launch script",
+  program = function()
+    return vim.fn.input('Path to script: ', vim.fn.getcwd() .. '/', 'file')
+  end,
+  pythonPath = python_path,
+  args = function()
+    local args_string = vim.fn.input('arguments: ')
+    local args = {}
+    for arg in string.gmatch(args_string, "%S+") do
+      args[#args+1] = arg
+    end
+    return args
+  end,
+}
+dap.configurations.python[#dap.configurations.python+1] = {
+  type = 'python',
+  request = 'launch',
+  name = "launch current file",
   program = "${file}",
   pythonPath = python_path,
 }
