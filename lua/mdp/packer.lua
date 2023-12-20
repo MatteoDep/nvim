@@ -73,7 +73,6 @@ require('packer').startup(function(use)
   -- style
   use 'navarasu/onedark.nvim' -- Theme inspired by Atom
   use 'nvim-lualine/lualine.nvim' -- Fancier statusline
-  use 'lukas-reineke/indent-blankline.nvim' -- Add indentation guides even on blank lines
 
   -- files tree
   use {
