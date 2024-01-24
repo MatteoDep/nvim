@@ -44,6 +44,10 @@ vim.o.foldmethod = "expr"
 vim.o.foldexpr = "nvim_treesitter#foldexpr()"
 vim.o.foldlevel = 1000
 
+vim.o.tabstop = 4
+vim.o.shiftwidth = 4
+vim.o.expandtab = true
+
 local iswsl = function()
   local s
   local f = assert(io.popen("uname -r", "r"))
@@ -56,7 +60,7 @@ end
 
 -- Set shell
 if vim.fn.has("win32") == 1 then
-  vim.o.shell = [["C:\Program Files\Git\usr\bin\bash.exe"]]
+  vim.o.shell = [[C:\Program Files\Git\usr\bin\bash.exe]]
   vim.o.shellcmdflag = '-c'
   vim.o.shellquote = ''
   vim.o.shellxescape = '"'
@@ -90,5 +94,12 @@ vim.o.hlsearch = true
 
 -- line and column in files
 vim.cmd("set isfname-=:")
+
+-- add filetypes
+vim.filetype.add({
+    extension = {
+        templ = "templ",
+    },
+})
 
 return M
