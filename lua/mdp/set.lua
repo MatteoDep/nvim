@@ -60,7 +60,7 @@ end
 
 -- Set shell
 if vim.fn.has("win32") == 1 then
-  vim.o.shell = [[C:\Program Files\Git\usr\bin\bash.exe]]
+  vim.o.shell = [["C:\Program Files\Git\bin\bash.exe"]]
   vim.o.shellcmdflag = '-c'
   vim.o.shellquote = ''
   vim.o.shellxescape = '"'
