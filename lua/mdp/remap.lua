@@ -20,8 +20,8 @@ vim.keymap.set('n', '<A-,>', '<C-w><')
 vim.keymap.set('n', '<A-.>', '<C-w>>')
 
 -- quickfix
-vim.keymap.set('n', '<C-n>', '<cmd>cnext<CR>zz')
-vim.keymap.set('n', '<C-p>', '<cmd>cprev<CR>zz')
+vim.keymap.set('n', '<C-j>', '<cmd>cnext<CR>zz')
+vim.keymap.set('n', '<C-k>', '<cmd>cprev<CR>zz')
 local ToggleQuickfix = function()
   if vim.fn.empty(vim.fn.filter(vim.fn.getwininfo(), 'v:val.quickfix')) > 0
   then
@@ -44,11 +44,11 @@ local function goto_buffer()
 end
 vim.keymap.set('n', 'gb', goto_buffer, {desc="next/goto <count> [B]uffer"})
 vim.keymap.set('n', 'gB', '<cmd>bprev<CR>zz', {desc="previous [B]uffer"})
-vim.keymap.set('n', '<A-n>', '<cmd>bnext<CR>zz', {desc="next/goto <count> [B]uffer"})
-vim.keymap.set('n', '<A-p>', '<cmd>bprev<CR>zz', {desc="previous [B]uffer"})
+vim.keymap.set('n', '<C-n>', '<cmd>bnext<CR>zz', {desc="next/goto <count> [B]uffer"})
+vim.keymap.set('n', '<C-p>', '<cmd>bprev<CR>zz', {desc="previous [B]uffer"})
 for i = 0, 9, 1 do
   local key = (i % 10) + 1
-  vim.keymap.set('n', '<A-'..key..'>', '<cmd>LualineBuffersJump '..key..'<CR>zz', {desc="previous [B]uffer"})
+  vim.keymap.set('n', '<C-'..key..'>', '<cmd>LualineBuffersJump '..key..'<CR>zz', {desc="previous [B]uffer"})
 end
 
 vim.keymap.set('n', 'XX', '<cmd>bdel<CR>')

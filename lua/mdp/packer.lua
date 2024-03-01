@@ -123,6 +123,9 @@ require('packer').startup(function(use)
 
   use "tpope/vim-obsession"
 
+  -- custom syntax
+  use 'towolf/vim-helm'
+
   if is_bootstrap then
     require('packer').sync()
   end
