@@ -56,9 +56,8 @@ local function goto_buffer()
 end
 vim.keymap.set('n', 'gb', goto_buffer, {desc="next/goto <count> [B]uffer"})
 vim.keymap.set('n', 'gB', '<cmd>bprev<CR>zz', {desc="previous [B]uffer"})
-for i = 0, 9, 1 do
-  local key = (i % 10) + 1
-  vim.keymap.set('n', '<C-'..key..'>', '<cmd>LualineBuffersJump '..key..'<CR>zz', {desc="previous [B]uffer"})
+for i = 1, 9, 1 do
+  vim.keymap.set('n', '<C-'..i..'>', '<cmd>LualineBuffersJump '..i..'<CR>zz', {desc="goto buffer "..i})
 end
 
 vim.keymap.set('n', 'XX', '<cmd>bdel<CR>')
