@@ -48,17 +48,13 @@ vim.keymap.set('n', '<C-q>', ToggleQuickfix)
 local function goto_buffer()
   if vim.v.count == 0 then
     vim.cmd("bnext")
-    vim.cmd("normal! zz")
   else
     vim.cmd("LualineBuffersJump "..vim.v.count)
-    vim.cmd("normal! zz")
   end
+  vim.cmd("normal! zz")
 end
 vim.keymap.set('n', 'gb', goto_buffer, {desc="next/goto <count> [B]uffer"})
 vim.keymap.set('n', 'gB', '<cmd>bprev<CR>zz', {desc="previous [B]uffer"})
-for i = 1, 9, 1 do
-  vim.keymap.set('n', '<C-'..i..'>', '<cmd>LualineBuffersJump '..i..'<CR>zz', {desc="goto buffer "..i})
-end
 
 vim.keymap.set('n', 'XX', '<cmd>bdel<CR>')
 vim.keymap.set('n', 'XQ', '<cmd>bdel!<CR>')
