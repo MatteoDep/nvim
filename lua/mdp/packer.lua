@@ -72,6 +72,7 @@ require('packer').startup(function(use)
 
   -- style
   use 'navarasu/onedark.nvim' -- Theme inspired by Atom
+  use { "catppuccin/nvim", as = "catppuccin" }
   use 'nvim-lualine/lualine.nvim' -- Fancier statusline
 
   -- files tree

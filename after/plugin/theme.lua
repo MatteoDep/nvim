@@ -1,26 +1,14 @@
 -- theme settings
-local settings = require('mdp.set')
-
 vim.o.termguicolors = true
-vim.o.background = settings.theme
+vim.o.background = "dark"
 
-if settings.colorscheme == 'onedark' then
-    local onedark = require('onedark')
-
-    onedark.setup  {
-        style = settings.theme,
-        transparent = false,
-    }
-    onedark.load()
-else
-    vim.cmd('colorscheme '..settings.colorscheme)
-end
+vim.cmd.colorscheme("catppuccin")
 
 -- lualine
 require('lualine').setup {
   options = {
     icons_enabled = true,
-    theme = settings.lualine_theme,
+    theme = "auto",
     component_separators = '|',
     section_separators = '',
   },

@@ -1,5 +1,3 @@
-local M = {}
-
 -- Set relative numbers
 vim.opt.relativenumber = true
 
@@ -30,11 +28,6 @@ vim.o.updatetime = 250
 
 -- enable sign column
 vim.o.signcolumn = 'yes'
-
--- Set colorscheme
-M.colorscheme = "onedark"
-M.theme = "dark"
-M.lualine_theme = "one"..M.theme
 
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
@@ -101,5 +94,3 @@ vim.filetype.add({
         templ = "templ",
     },
 })
-
-return M
