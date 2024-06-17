@@ -21,6 +21,8 @@ dap.listeners.before.event_exited["dapui_config"] = function()
 end
 
 vim.keymap.set('n', '<leader>dc', dap.continue, {desc="[d]ap [c]ontinue"})
+vim.keymap.set('n', '<leader>ds', dap.close, {desc="[d]ap [s]top"})
+vim.keymap.set('n', '<leader>dd', dap.disconnect, {desc="[d]ap [d]isconnect"})
 vim.keymap.set('n', '<leader>db', dap.toggle_breakpoint, {desc="[d]ap toggle [b]reakpoint"})
 vim.keymap.set('n', '<leader>dB', function()
   dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
