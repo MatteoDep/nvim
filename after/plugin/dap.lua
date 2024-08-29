@@ -1,5 +1,6 @@
 local dap = require('dap')
 local dapui = require("dapui")
+local dapvt = require("nvim-dap-virtual-text")
 
 vim.fn.sign_define('DapBreakpoint', {text=''})
 vim.fn.sign_define('DapBreakpointCondition', {text=''})
@@ -8,22 +9,19 @@ vim.fn.sign_define('DapStopped', {text='→'})
 vim.fn.sign_define('DapBreakpointRejected', {text=''})
 
 dapui.setup()
-require("nvim-dap-virtual-text").setup({})
+dapvt.setup({})
 
-dap.listeners.after.event_initialized["dapui_config"] = function()
-  dap.repl.open()
-end
-dap.listeners.before.event_terminated["dapui_config"] = function()
+dap.listeners.before.event_terminated.dapui_config = function()
   dapui.close()
   dap.repl.close()
 end
-dap.listeners.before.event_exited["dapui_config"] = function()
+dap.listeners.before.event_exited.dapui_config = function()
   dapui.close()
   dap.repl.close()
 end
 
 vim.keymap.set('n', '<leader>dc', dap.continue, {desc="[d]ap [c]ontinue"})
-vim.keymap.set('n', '<leader>ds', dap.close, {desc="[d]ap [s]top (close)"})
+vim.keymap.set('n', '<leader>ds', function () dap.close(); dapvt.disable(); dapvt.enable(); dapui.close(); dap.repl.close() end, {desc="[d]ap [s]top (close)"})
 vim.keymap.set('n', '<leader>dd', dap.disconnect, {desc="[d]ap [d]isconnect"})
 vim.keymap.set('n', '<leader>db', dap.toggle_breakpoint, {desc="[d]ap toggle [b]reakpoint"})
 vim.keymap.set('n', '<leader>dB', function()
@@ -35,8 +33,19 @@ end, { desc = "[d]ap [L]og point" })
 vim.keymap.set('n', '<leader>dl', dap.step_into, {desc="[d]ap step into"})
 vim.keymap.set('n', '<leader>dj', dap.step_over, {desc="[d]ap step over"})
 vim.keymap.set('n', '<leader>dh', dap.step_out, {desc="[d]ap step out"})
-vim.keymap.set('n', '<leader>dr', dap.repl.toggle, {desc="[d]ap [r]epl toggle"})
 vim.keymap.set('n', '<leader>du', dapui.toggle, {desc="[d]ap [u]i toggle"})
+vim.keymap.set('n', '<leader>de', dapui.eval, {desc="[d]ap [u]i evaluate"})
+local float_element_args = {
+  width = vim.o.columns,
+  height = vim.o.lines - 3,
+  enter = true,
+  position = "center",
+}
+vim.keymap.set('n', '<leader>dow', function () dapui.float_element("watches", float_element_args) end, {desc="[d]ap [u]i open [w]atches"})
+vim.keymap.set('n', '<leader>dob', function () dapui.float_element("breakpoints", float_element_args) end, {desc="[d]ap [u]i open [b]reakpoints"})
+vim.keymap.set('n', '<leader>dos', function () dapui.float_element("scopes", float_element_args) end, {desc="[d]ap [u]i open [s]copes"})
+vim.keymap.set('n', '<leader>dor', function () dapui.float_element("repl", float_element_args) end, {desc="[d]ap [u]i open [r]epl"})
+vim.keymap.set('n', '<leader>dt', '<cmd>DapVirtualTextToggle<CR>', {desc="[d]ap virtual [t]ext toggle"})
 
 -- variables
 local bindir = "bin"
@@ -142,16 +151,21 @@ dap.configurations.python[#dap.configurations.python+1] = {
   type = 'python',
   request = "attach",
   name = "attach remote",
-  host = function()
-    return vim.fn.input({
+  connect = function()
+    local host = vim.fn.input({
       prompt='host: ',
       default='localhost',
     })
-  end,
-  port = function()
-    return vim.fn.input({
+    local port = vim.fn.input({
       prompt='port: ',
       default='5678',
     })
+    return { host = host, port = port }
   end,
+  pathMappings = {
+        {
+            localRoot = "${workspaceFolder}",
+            remoteRoot = "."
+        },
+    }
 }
