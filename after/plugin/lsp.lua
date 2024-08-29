@@ -76,7 +76,7 @@ local servers = {
   ruff_lsp = {},
   cssls = {},
   html = {
-    filetypes = { "html", "templ" },
+    filetypes = { "html" },
   },
   tailwindcss = {
     filetypes = { "templ", "astro", "javascript", "typescript", "react" },
