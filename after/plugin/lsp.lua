@@ -69,7 +69,7 @@ local servers = {
     },
   },
   csharp_ls = {},
-  tsserver = {},
+  ts_ls = {},
   bashls = {},
   jsonls = {},
   gopls = {},
