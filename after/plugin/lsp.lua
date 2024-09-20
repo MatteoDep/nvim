@@ -6,7 +6,7 @@ local on_attach = function(_, bufnr)
   vim.keymap.set('n', 'gd', require('telescope.builtin').lsp_definitions, { buffer = bufnr, desc = '[G]oto [D]efinition' })
   vim.keymap.set('n', 'gr', require('telescope.builtin').lsp_references, { buffer = bufnr, desc = '[G]oto [R]eferences' })
   vim.keymap.set('n', 'gI', vim.lsp.buf.implementation, { buffer = bufnr, desc = '[G]oto [I]mplementation' })
-  vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, { buffer = bufnr, desc = 'Type [D]efinition' })
+  vim.keymap.set('n', '<leader>td', vim.lsp.buf.type_definition, { buffer = bufnr, desc = 'Type [D]efinition' })
   vim.keymap.set('n', '<leader>sD', require('telescope.builtin').lsp_document_symbols,
     { buffer = bufnr, desc = '[S]earch [D]ocument symbols' })
   vim.keymap.set('n', '<leader>sW', require('telescope.builtin').lsp_dynamic_workspace_symbols,
@@ -123,7 +123,7 @@ null_ls.setup({
     }),
   },
 })
-vim.keymap.set('n', '<leader>DD', function()
+vim.keymap.set('n', '<leader>0', function()
     for _, source in ipairs(null_ls_sources.get_all()) do
       null_ls.toggle(source.name)
     end
