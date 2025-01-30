@@ -118,12 +118,14 @@ local servers = {
     filetypes = { "templ", "astro", "javascript", "typescript", "react" },
     -- init_options = { userLanguages = { templ = "html" } },
   },
-  htmx = {
-    filetypes = { "html", "templ" },
-  },
   templ = {},
   yamlls = {},
 }
+if vim.fn.has("win32") == 0 then
+  servers["htmx"] = {
+    filetypes = { "html", "templ" },
+  }
+end
 
 -- Setup neovim lua configuration
 require('neodev').setup()
