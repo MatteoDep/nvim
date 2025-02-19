@@ -59,10 +59,6 @@ vim.keymap.set('n', 'gB', '<cmd>bprev<CR>zz', {desc="previous [B]uffer"})
 vim.keymap.set('n', 'XX', '<cmd>bdel<CR>')
 vim.keymap.set('n', 'XQ', '<cmd>bdel!<CR>')
 
--- folding
-vim.keymap.set('n', '<Space><Space>', 'za')
-vim.keymap.set('n', '<Space><CR>', 'zA')
-
 -- swap lines
 vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
 vim.keymap.set('v', 'K', ":m '>-2<CR>gv=gv")
