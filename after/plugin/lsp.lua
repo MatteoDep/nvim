@@ -110,6 +110,7 @@ local servers = {
   jsonls = {},
   gopls = {},
   ruff = {},
+  rust_analyzer = {},
   cssls = {},
   html = {
     filetypes = { "html" },
@@ -120,6 +121,7 @@ local servers = {
   },
   templ = {},
   yamlls = {},
+  helm_ls = {},
 }
 if vim.fn.has("win32") == 0 then
   servers["htmx"] = {
@@ -159,9 +161,7 @@ local null_ls_sources = require("null-ls.sources")
 
 null_ls.setup({
   sources = {
-    null_ls.builtins.diagnostics.mypy.with({
-      command = { "mypy", "--install-types", "--non-interactive" },
-    }),
+    null_ls.builtins.diagnostics.mypy,
   },
 })
 vim.keymap.set('n', '<leader>0', function()
