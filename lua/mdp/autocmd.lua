@@ -13,6 +13,9 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 local format_trailing = vim.api.nvim_create_augroup('FormatTrailing', { clear = true })
 vim.api.nvim_create_autocmd('BufWritePre', {
   callback = function ()
+    if vim.bo.filetype == 'markdown' then
+      return
+    end
     vim.cmd([[%s/\s\+$//e]])
   end,
   group = format_trailing,
