@@ -945,6 +945,40 @@ require('lazy').setup({
       --  Check out: https://github.com/echasnovski/mini.nvim
       require('mini.align').setup()
       require('mini.tabline').setup()
+      require('mini.files').setup {
+        mappings = {
+          go_in = '<CR>',
+          go_out = '<BS>',
+          reset = 'g<BS>',
+        },
+      }
+
+      vim.keymap.set('n', '<leader>e', MiniFiles.open, { desc = 'Open MiniFiles' })
+      vim.keymap.set('n', '<leader>E', function()
+        MiniFiles.open(vim.api.nvim_buf_get_name(0))
+      end, { desc = 'Open MiniFiles on current buffer location' })
+
+      -- Yank in register full path of entry under cursor
+      local yank_path = function()
+        local path = (MiniFiles.get_fs_entry() or {}).path
+        if path == nil then
+          return vim.notify 'Cursor is not on valid entry'
+        end
+        vim.fn.setreg(vim.v.register, path)
+      end
+
+      -- Open path with system default handler (useful for non-text files)
+      local ui_open = function()
+        vim.ui.open(MiniFiles.get_fs_entry().path)
+      end
+      vim.api.nvim_create_autocmd('User', {
+        pattern = 'MiniFilesBufferCreate',
+        callback = function(args)
+          local b = args.data.buf_id
+          vim.keymap.set('n', 'gX', ui_open, { buffer = b, desc = 'OS open' })
+          vim.keymap.set('n', 'gy', yank_path, { buffer = b, desc = 'Yank path' })
+        end,
+      })
     end,
   },
   { -- Highlight, edit, and navigate code
