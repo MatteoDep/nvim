@@ -84,6 +84,8 @@ I hope you enjoy your Neovim journey,
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
+local utils = require 'custom.utils'
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -422,7 +424,12 @@ require('lazy').setup({
           },
         },
 
-        -- pickers = {}
+        pickers = {
+          find_files = {
+            find_command = utils.get_fd_command(),
+          },
+        },
+
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),

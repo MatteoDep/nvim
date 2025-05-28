@@ -57,4 +57,23 @@ function M.FormatRangeCallback()
   vim.go.operatorfunc = 'v:lua.op_func_formatting'
 end
 
+function M.get_fd_command()
+  local global_fdignore
+  if vim.fn.has 'win32' == 1 then
+    global_fdignore = vim.fn.expand '$HOME' .. '/AppData/Roaming/fd/ignore'
+  else
+    global_fdignore = vim.fn.expand '$HOME' .. '/.config/fd/ignore'
+  end
+  local f = io.open(global_fdignore, 'rb')
+  local fd_cmd = { 'fd', '-IH' }
+  if f then
+    f:close()
+    for line in io.lines(global_fdignore) do
+      fd_cmd[#fd_cmd + 1] = '-E'
+      fd_cmd[#fd_cmd + 1] = line
+    end
+  end
+  return fd_cmd
+end
+
 return M
