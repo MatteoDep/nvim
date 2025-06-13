@@ -510,7 +510,21 @@ require('lazy').setup({
       { 'j-hui/fidget.nvim', opts = {} },
 
       -- Allows extra capabilities provided by blink.cmp
-      'saghen/blink.cmp',
+      { -- optional saghen/blink.cmp completion source
+        'saghen/blink.cmp',
+        opts = {
+          sources = {
+            default = { 'lsp', 'path', 'snippets', 'buffer' },
+            per_filetype = {
+              sql = { 'snippets', 'dadbod', 'buffer' },
+            },
+            -- add vim-dadbod-completion to your completion providers
+            providers = {
+              dadbod = { name = 'Dadbod', module = 'vim_dadbod_completion.blink' },
+            },
+          },
+        },
+      },
     },
     config = function()
       -- Brief aside: **What is LSP?**
@@ -977,6 +991,9 @@ require('lazy').setup({
           go_out = '<BS>',
           reset = 'g<BS>',
         },
+        windows = {
+          preview = true,
+        },
       }
 
       vim.keymap.set('n', '<leader>e', MiniFiles.open, { desc = 'Open MiniFiles' })
@@ -1043,11 +1060,11 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  -- require 'kickstart.plugins.debug',
+  require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
   -- require 'kickstart.plugins.autopairs',
-  require 'kickstart.plugins.neo-tree',
+  -- require 'kickstart.plugins.neo-tree',
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
