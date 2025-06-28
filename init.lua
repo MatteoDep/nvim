@@ -176,7 +176,7 @@ vim.o.confirm = true
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
 -- Diagnostic keymaps
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+-- vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 vim.keymap.set('n', '<leader>d', function()
   vim.diagnostic.open_float { scope = 'line' }
 end)
@@ -224,7 +224,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
--- My costom stuff
+-- My custom stuff
 require 'custom'
 
 -- [[ Install `lazy.nvim` plugin manager ]]
@@ -708,19 +708,7 @@ require('lazy').setup({
         clangd = {},
         gopls = {},
         ruff = {},
-        pyright = {
-          settings = {
-            pyright = {
-              disableOrganizeImports = true, -- Using Ruff
-            },
-            python = {
-              analysis = {
-                ignore = { '*' }, -- Using Ruff
-                typeCheckingMode = 'off', -- Using mypy
-              },
-            },
-          },
-        },
+        pyright = {},
         rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
