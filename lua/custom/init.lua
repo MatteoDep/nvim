@@ -1,10 +1,5 @@
 local utils = require 'custom.utils'
 
--- Set folding method to treesitter
-vim.o.foldmethod = 'expr'
-vim.o.foldexpr = 'nvim_treesitter#foldexpr()'
-vim.o.foldlevel = 1000
-
 -- gui
 if vim.g.neovide then
   vim.g.neovide_scale_factor = 0.7
@@ -36,10 +31,6 @@ vim.filetype.add {
 }
 
 -- KEYMAPS
-
--- Remap for dealing with line wrap
-vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
-vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
 -- windows
 vim.keymap.set('n', '<C-h>', '<C-w>h')
@@ -73,20 +64,6 @@ local ToggleQuickfix = function()
   end
 end
 vim.keymap.set('n', '<C-q>', ToggleQuickfix)
-
--- buffers
-local function goto_buffer()
-  if vim.v.count == 0 then
-    vim.cmd 'bnext'
-  else
-    vim.cmd('LualineBuffersJump ' .. vim.v.count)
-  end
-  vim.cmd 'normal! zz'
-end
-vim.keymap.set('n', 'gb', goto_buffer, { desc = 'next/goto <count> [B]uffer' })
-vim.keymap.set('n', 'gB', '<cmd>bprev<CR>zz', { desc = 'previous [B]uffer' })
-vim.keymap.set('n', 'XX', '<cmd>bdel<CR>')
-vim.keymap.set('n', 'XQ', '<cmd>bdel!<CR>')
 
 -- swap lines
 vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
