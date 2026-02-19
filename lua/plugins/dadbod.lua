@@ -26,16 +26,14 @@ return {
 
       local function execute_query()
         local conn_string = get_conn_string()
-        if not vim.api.nvim_get_mode().mode:find '^[vV\22]' then vim.cmd 'norm vip' end
+        if not vim.api.nvim_get_mode().mode:find '^[vV\22]' then vim.cmd "exe 'norm! vip'" end
         vim.fn.feedkeys(':DB ' .. conn_string)
       end
 
       local function set_db_url() vim.env.DATABASE_URL = get_conn_string() end
 
       local function pg_import(url)
-        if not url or url == '' then
-          url = get_conn_string()
-        end
+        if not url or url == '' then url = get_conn_string() end
         if not url or url == '' then
           vim.ui.input({ prompt = 'PostgreSQL URL: ' }, function(input_url)
             if not input_url then return end
@@ -82,7 +80,7 @@ return {
       -- Command: :PgImport [url]
       vim.api.nvim_create_user_command('PgImport', function(opts) pg_import(opts.args) end, { nargs = '?' })
 
-      vim.keymap.set('n', '<leader>qr', execute_query, { desc = '[r]un query' })
+      vim.keymap.set({ 'n', 'v' }, '<leader>qr', execute_query, { desc = '[r]un query' })
       vim.keymap.set('n', '<leader>qs', set_db_url, { desc = '[s]et db for autocomplete' })
     end,
   },

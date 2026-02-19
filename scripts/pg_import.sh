@@ -13,4 +13,6 @@ chmod 600 "$PGPASSFILE"
 URL=$(printf "$URL\n" | sed -E 's/^([a-z:]+:\/\/)(.+):(.+)@(.+):(.+)\/(\w+)(\?.*)?$/\1\2@\4:\5\/\6\7/')
 echo "$URL"
 
-cat "$FILE_NAME" | psql "$URL" -c "COPY $TABLE_NAME FROM STDIN CSV HEADER"
+HEADER=$(head -n 1 "$FILE_NAME")
+
+cat "$FILE_NAME" | psql "$URL" -c "COPY $TABLE_NAME ($HEADER) FROM STDIN CSV HEADER"
