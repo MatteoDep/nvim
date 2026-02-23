@@ -44,9 +44,7 @@ require('lazy').setup({
       scroll = { enabled = true },
       statuscolumn = { enabled = true },
       bufdelete = { enabled = true },
-      terminal = {
-        auto_insert = false,
-      },
+      terminal = { enabled = true },
     },
     keys = {
       { '<A-g>', function() Snacks.lazygit() end, desc = 'Lazygit', mode = { 'n', 't' } },
@@ -57,7 +55,7 @@ require('lazy').setup({
       { '<leader>n', function() Snacks.notifier.show_history() end, desc = 'Notification History' },
       { 'XX', function() Snacks.bufdelete() end, desc = 'Delete Buffer' },
       { '<leader>rn', function() Snacks.rename.rename_file() end, desc = 'Rename File' },
-      { '<A-t>', function() Snacks.terminal() end, desc = 'Toggle Terminal', mode = { 'n', 't' } },
+      { '<A-t>', function() Snacks.terminal.toggle(nil, { auto_insert = false }) end, desc = 'Toggle Terminal', mode = { 'n', 't' } },
     },
     init = function()
       vim.api.nvim_create_autocmd('User', {
