@@ -49,7 +49,7 @@ require('lazy').setup({
     keys = {
       { '<A-g>', function() Snacks.lazygit() end, desc = 'Lazygit', mode = { 'n', 't' } },
       { '<leader>z', function() Snacks.zen() end, desc = 'Toggle Zen Mode' },
-      { '<leader>Z', function() Snacks.zen.zoom() end, desc = 'Toggle Zoom' },
+      { '<A-z>', function() Snacks.zen.zoom() end, desc = 'Toggle Zoom', mode = { 'n', 't', 'i' } },
       { '<leader>.', function() Snacks.scratch() end, desc = 'Toggle Scratch Buffer' },
       { '<leader>S', function() Snacks.scratch.select() end, desc = 'Select Scratch Buffer' },
       { '<leader>n', function() Snacks.notifier.show_history() end, desc = 'Notification History' },
@@ -95,7 +95,10 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>s.', FzfLua.builtin, { desc = 'fzf-lua builtin' })
 
       -- files & buffers
-      vim.keymap.set('n', '<leader>sf', FzfLua.files, { desc = 'Find Files' })
+      local utils = require 'utils'
+      vim.keymap.set('n', '<leader>sf', function()
+        FzfLua.files { cmd = table.concat(utils.get_fd_command(), ' ') }
+      end, { desc = 'Find Files' })
       vim.keymap.set('n', '<leader>sF', FzfLua.git_files, { desc = 'Find Git Files' })
       vim.keymap.set('n', '<leader>sb', FzfLua.blines, { desc = 'Buffer Lines' })
       vim.keymap.set('n', '<leader>sB', FzfLua.lines, { desc = 'Grep Open Buffers' })
@@ -246,8 +249,10 @@ require('lazy').setup({
       vim.list_extend(ensure_installed, {
         'lua-language-server', -- Lua Language server
         'stylua', -- Used to format Lua code
+        'yaml-language-server', -- YAML Language server
         -- You can add other tools here that you want Mason to install
       })
+      servers.yamlls = {}
 
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
