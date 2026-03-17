@@ -7,23 +7,6 @@ return {
     version = '*',
     event = 'VimEnter',
     config = function()
-      local function get_conn_string()
-        -- Get current buffer and cursor position
-        local bufnr = vim.api.nvim_get_current_buf()
-        local current_line = vim.api.nvim_win_get_cursor(0)[1]
-        local pattern = '-- conn: '
-
-        -- Search through lines above current position
-        for line_num = current_line, 1, -1 do
-          local line_content = vim.api.nvim_buf_get_lines(bufnr, line_num - 1, line_num, false)[1]
-
-          -- Check if line exists and matches pattern
-          if line_content and line_content:match(pattern) then return line_content:gsub(pattern, '') end
-        end
-
-        return ''
-      end
-
       local function select_db_for_url(url, callback)
         local bootstrap = url:gsub('{{dbname}}', 'postgres')
         local names = {}
@@ -32,7 +15,7 @@ return {
           on_stdout = function(_, data)
             if data then
               for _, line in ipairs(data) do
-                local name = line:match('^%s*(.-)%s*$')
+                local name = line:match '^%s*(.-)%s*$'
                 if name and name ~= '' then table.insert(names, name) end
               end
             end
@@ -56,8 +39,8 @@ return {
         })
       end
 
-      local function select_connection()
-        local config_path = vim.fn.stdpath 'config' .. '/connections.yaml'
+      local function select_connection(callback)
+        local config_path = './connections.yaml'
         local ok, lines = pcall(vim.fn.readfile, config_path)
         if not ok then
           vim.notify('Could not read ' .. config_path, vim.log.levels.ERROR)
@@ -86,42 +69,85 @@ return {
             select_db_for_url(url, function(final_url)
               if final_url then
                 vim.b.db = final_url
-                vim.notify('b:db = ' .. selected .. ' / ' .. (final_url:match('/([^/?]+)%??') or '?'), vim.log.levels.INFO)
+                vim.notify('b:db = ' .. selected .. ' / ' .. (final_url:match '/([^/?]+)%??' or '?'), vim.log.levels.INFO)
+                if callback then callback(final_url) end
               end
             end)
           else
             vim.b.db = url
             vim.notify('b:db = ' .. selected, vim.log.levels.INFO)
+            if callback then callback(url) end
           end
         end)
       end
 
+      local function check_connection(cb)
+        if not vim.b.db then
+          select_connection(cb)
+        else
+          vim.ui.select({ 'Run', 'Change connection', 'Abort' }, { prompt = 'b:db = ' .. (vim.b.db or '(none)') }, function(selected)
+            if selected == 'Change connection' then
+              select_connection(cb)
+            elseif selected == 'Abort' or not selected then
+              return
+            end
+            cb()
+          end)
+        end
+      end
+
       local function execute_query()
-        if not vim.b.db then select_connection() end
         local mode = vim.api.nvim_get_mode().mode
         local in_visual = mode:find '^[vV\22]'
         if in_visual then vim.cmd 'normal! \27' end -- exit visual to save '< '>
         local pos = vim.api.nvim_win_get_cursor(0)
-        vim.ui.select({ 'Run', 'Change connection', 'Abort' }, { prompt = 'b:db = ' .. (vim.b.db or '(none)') }, function(selected)
-          if selected == 'Change connection' then select_connection()
-          elseif selected == 'Abort' or not selected then return end
+
+        -- Determine query range: for normal mode, temporarily select the paragraph
+        if not in_visual then
+          vim.cmd 'normal! vip'
+          vim.cmd('normal! \27')
+          vim.api.nvim_win_set_cursor(0, pos)
+        end
+
+        -- Highlight the query so the user can see what will run
+        local ns = vim.api.nvim_create_namespace 'dadbod_preview'
+        vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)
+        local s = vim.api.nvim_buf_get_mark(0, '<')
+        local e = vim.api.nvim_buf_get_mark(0, '>')
+        vim.api.nvim_buf_set_extmark(0, ns, s[1] - 1, 0, {
+          end_row = e[1] - 1,
+          end_col = #vim.api.nvim_buf_get_lines(0, e[1] - 1, e[1], true)[1],
+          hl_group = 'Visual',
+        })
+
+        local function clear_hl()
+          vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)
+        end
+
+        -- Clear highlight on cursor move in case the user aborts
+        vim.api.nvim_create_autocmd('CursorMoved', {
+          buffer = 0,
+          once = true,
+          callback = clear_hl,
+        })
+
+        check_connection(function()
+          clear_hl()
           vim.api.nvim_win_set_cursor(0, pos)
           if in_visual then
             vim.cmd 'normal! gv'
           else
             vim.cmd 'norm! vip'
           end
-          vim.fn.feedkeys(':DB\r')
+          vim.fn.feedkeys ':DB\r'
         end)
       end
 
-
       local function pg_import(url)
-        if not url or url == '' then url = get_conn_string() end
-        if not url or url == '' then
-          vim.ui.input({ prompt = 'PostgreSQL URL: ' }, function(input_url)
-            if not input_url then return end
-            pg_import(input_url)
+        if not url then
+          check_connection(function(selected_url)
+            if not selected_url then return end
+            pg_import(selected_url)
           end)
           return
         end
