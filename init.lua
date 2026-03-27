@@ -38,13 +38,14 @@ require('lazy').setup({
         enabled = true,
         timeout = 3000,
       },
-      -- picker = { enabled = true },
-      quickfile = { enabled = true },
+      picker = { enabled = false },
+      quickfile = { enabled = false },
       scope = { enabled = true },
       scroll = { enabled = true },
       statuscolumn = { enabled = true },
       bufdelete = { enabled = true },
       terminal = { enabled = true },
+      scratch = { ft = 'markdown' },
     },
     keys = {
       { '<A-g>', function() Snacks.lazygit() end, desc = 'Lazygit', mode = { 'n', 't' } },
@@ -100,8 +101,8 @@ require('lazy').setup({
         FzfLua.files { cmd = table.concat(utils.get_fd_command(), ' ') }
       end, { desc = 'Find Files' })
       vim.keymap.set('n', '<leader>sF', FzfLua.git_files, { desc = 'Find Git Files' })
-      vim.keymap.set('n', '<leader>sb', FzfLua.blines, { desc = 'Buffer Lines' })
-      vim.keymap.set('n', '<leader>sB', FzfLua.lines, { desc = 'Grep Open Buffers' })
+      vim.keymap.set('n', '<leader>sb', FzfLua.buffers, { desc = 'Select Open Buffer' })
+      vim.keymap.set('n', '<leader>sB', FzfLua.blines, { desc = 'Buffer Lines' })
 
       -- grep
       vim.keymap.set('n', '<leader>sg', FzfLua.live_grep, { desc = 'Grep' })
