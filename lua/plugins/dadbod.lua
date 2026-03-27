@@ -86,12 +86,11 @@ return {
           select_connection(cb)
         else
           vim.ui.select({ 'Run', 'Change connection', 'Abort' }, { prompt = 'b:db = ' .. (vim.b.db or '(none)') }, function(selected)
-            if selected == 'Change connection' then
+            if selected == 'Run' then
+              cb()
+            elseif selected == 'Change connection' then
               select_connection(cb)
-            elseif selected == 'Abort' or not selected then
-              return
             end
-            cb()
           end)
         end
       end
