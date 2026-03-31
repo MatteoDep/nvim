@@ -11,9 +11,9 @@ return {
         vim.b.db          = final_url
         vim.b.db_name     = name
         vim.b.db_base_url = base_url
-        local dbname = final_url:match '/([^/?]+)%??'
+        local dbname = final_url:match '.*/([^/?]+)'
         local label  = (base_url and dbname) and (name .. ' / ' .. dbname) or name
-        vim.notify('b:db = ' .. label, vim.log.levels.INFO)
+        vim.notify('db = ' .. label, vim.log.levels.INFO)
       end
 
       local function select_db_for_url(url, callback)
@@ -106,9 +106,9 @@ return {
           select_connection(cb)
         else
           local label = vim.b.db_name or vim.b.db or '(none)'
-          if vim.b.db_base_url and vim.b.db then
-            local dbname = vim.b.db:match '/([^/?]+)%??'
-            if dbname then label = (vim.b.db_name or '?') .. ' / ' .. dbname end
+          if vim.b.db_base_url then
+            local dbname = vim.b.db:match '.*/([^/?]+)'
+            if dbname then label = label .. ' / ' .. dbname end
           end
           local opts = { 'Run', 'Change connection', 'Abort' }
           if vim.b.db_base_url then table.insert(opts, 2, 'Change database') end
