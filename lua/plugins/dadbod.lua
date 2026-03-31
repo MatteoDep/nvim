@@ -7,6 +7,15 @@ return {
     version = '*',
     event = 'VimEnter',
     config = function()
+      local function set_db(name, base_url, final_url)
+        vim.b.db          = final_url
+        vim.b.db_name     = name
+        vim.b.db_base_url = base_url
+        local dbname = final_url:match '/([^/?]+)%??'
+        local label  = (base_url and dbname) and (name .. ' / ' .. dbname) or name
+        vim.notify('b:db = ' .. label, vim.log.levels.INFO)
+      end
+
       local function select_db_for_url(url, callback)
         local bootstrap = url:gsub('{{dbname}}', 'postgres')
         local names = {}
@@ -68,15 +77,26 @@ return {
           if url:find('{{dbname}}', 1, true) then
             select_db_for_url(url, function(final_url)
               if final_url then
-                vim.b.db = final_url
-                vim.notify('b:db = ' .. selected .. ' / ' .. (final_url:match '/([^/?]+)%??' or '?'), vim.log.levels.INFO)
+                set_db(selected, url, final_url)
                 if callback then callback(final_url) end
               end
             end)
           else
-            vim.b.db = url
-            vim.notify('b:db = ' .. selected, vim.log.levels.INFO)
+            set_db(selected, nil, url)
             if callback then callback(url) end
+          end
+        end)
+      end
+
+      local function select_db(cb)
+        if not vim.b.db_base_url then
+          vim.notify('No template URL; select a connection first', vim.log.levels.WARN)
+          return
+        end
+        select_db_for_url(vim.b.db_base_url, function(final_url)
+          if final_url then
+            set_db(vim.b.db_name, vim.b.db_base_url, final_url)
+            if cb then cb() end
           end
         end)
       end
@@ -85,9 +105,18 @@ return {
         if not vim.b.db then
           select_connection(cb)
         else
-          vim.ui.select({ 'Run', 'Change connection', 'Abort' }, { prompt = 'b:db = ' .. (vim.b.db or '(none)') }, function(selected)
+          local label = vim.b.db_name or vim.b.db or '(none)'
+          if vim.b.db_base_url and vim.b.db then
+            local dbname = vim.b.db:match '/([^/?]+)%??'
+            if dbname then label = (vim.b.db_name or '?') .. ' / ' .. dbname end
+          end
+          local opts = { 'Run', 'Change connection', 'Abort' }
+          if vim.b.db_base_url then table.insert(opts, 2, 'Change database') end
+          vim.ui.select(opts, { prompt = label .. '> ' }, function(selected)
             if selected == 'Run' then
               cb()
+            elseif selected == 'Change database' then
+              select_db(cb)
             elseif selected == 'Change connection' then
               select_connection(cb)
             end
@@ -190,6 +219,7 @@ return {
       vim.api.nvim_create_user_command('PgImport', function(opts) pg_import(opts.args) end, { nargs = '?' })
       vim.keymap.set({ 'n', 'v' }, '<leader>qr', execute_query, { desc = '[r]un query' })
       vim.keymap.set('n', '<leader>qs', select_connection, { desc = '[s]elect connection' })
+      vim.keymap.set('n', '<leader>qd', select_db, { desc = '[d]atabase select' })
     end,
   },
 }
