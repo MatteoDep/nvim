@@ -47,6 +47,54 @@ require('lazy').setup({
       terminal = { enabled = true },
       scratch = { ft = 'markdown' },
     },
+    config = function(_, opts)
+      require('snacks').setup(opts)
+      vim.api.nvim_create_autocmd('WinLeave', {
+        callback = function()
+          local buf = vim.api.nvim_get_current_buf()
+          if vim.b[buf].snacks_terminal then
+            local mode = vim.fn.mode()
+            vim.b[buf].terminal_saved_mode = mode
+            if mode == 'n' then
+              vim.b[buf].terminal_saved_view = vim.fn.winsaveview()
+            end
+          end
+        end,
+      })
+      vim.api.nvim_create_autocmd('BufEnter', {
+        callback = function(ev)
+          if vim.b[ev.buf].snacks_terminal and not vim.b[ev.buf].terminal_restoring then
+            if vim.b[ev.buf].terminal_saved_mode == 'n' then
+              vim.b[ev.buf].terminal_restoring = true
+              vim.schedule(function()
+                vim.cmd('stopinsert')
+              end)
+            end
+          end
+        end,
+      })
+      vim.api.nvim_create_autocmd('ModeChanged', {
+        pattern = 't:nt',
+        callback = function(ev)
+          if not vim.b[ev.buf].terminal_restoring then return end
+          vim.b[ev.buf].terminal_restoring = false
+          local saved = vim.b[ev.buf].terminal_saved_view
+          if saved then
+            vim.fn.winrestview(saved)
+          end
+        end,
+      })
+      vim.api.nvim_create_autocmd('TermOpen', {
+        callback = function(ev)
+          vim.keymap.set('n', "g'", function()
+            local saved = vim.b[ev.buf].terminal_saved_view
+            if saved then
+              vim.fn.winrestview(saved)
+            end
+          end, { buffer = ev.buf, desc = 'Restore saved terminal position' })
+        end,
+      })
+    end,
     keys = {
       { '<A-g>', function() Snacks.lazygit() end, desc = 'Lazygit', mode = { 'n', 't' } },
       { '<leader>z', function() Snacks.zen() end, desc = 'Toggle Zen Mode' },
@@ -56,7 +104,7 @@ require('lazy').setup({
       { '<leader>n', function() Snacks.notifier.show_history() end, desc = 'Notification History' },
       { 'XX', function() Snacks.bufdelete() end, desc = 'Delete Buffer' },
       { '<leader>rn', function() Snacks.rename.rename_file() end, desc = 'Rename File' },
-      { '<A-t>', function() Snacks.terminal.toggle(nil, { auto_insert = false }) end, desc = 'Toggle Terminal', mode = { 'n', 't' } },
+      { '<A-t>', function() Snacks.terminal.toggle() end, desc = 'Toggle Terminal', mode = { 'n', 't' } },
     },
     init = function()
       vim.api.nvim_create_autocmd('User', {
