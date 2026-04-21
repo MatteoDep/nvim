@@ -55,9 +55,7 @@ require('lazy').setup({
           if vim.b[buf].snacks_terminal then
             local mode = vim.fn.mode()
             vim.b[buf].terminal_saved_mode = mode
-            if mode == 'n' then
-              vim.b[buf].terminal_saved_view = vim.fn.winsaveview()
-            end
+            if mode == 'n' then vim.b[buf].terminal_saved_view = vim.fn.winsaveview() end
           end
         end,
       })
@@ -66,9 +64,7 @@ require('lazy').setup({
           if vim.b[ev.buf].snacks_terminal and not vim.b[ev.buf].terminal_restoring then
             if vim.b[ev.buf].terminal_saved_mode == 'n' then
               vim.b[ev.buf].terminal_restoring = true
-              vim.schedule(function()
-                vim.cmd('stopinsert')
-              end)
+              vim.schedule(function() vim.cmd 'stopinsert' end)
             end
           end
         end,
@@ -79,18 +75,14 @@ require('lazy').setup({
           if not vim.b[ev.buf].terminal_restoring then return end
           vim.b[ev.buf].terminal_restoring = false
           local saved = vim.b[ev.buf].terminal_saved_view
-          if saved then
-            vim.fn.winrestview(saved)
-          end
+          if saved then vim.fn.winrestview(saved) end
         end,
       })
       vim.api.nvim_create_autocmd('TermOpen', {
         callback = function(ev)
           vim.keymap.set('n', "g'", function()
             local saved = vim.b[ev.buf].terminal_saved_view
-            if saved then
-              vim.fn.winrestview(saved)
-            end
+            if saved then vim.fn.winrestview(saved) end
           end, { buffer = ev.buf, desc = 'Restore saved terminal position' })
         end,
       })
@@ -145,9 +137,7 @@ require('lazy').setup({
 
       -- files & buffers
       local utils = require 'utils'
-      vim.keymap.set('n', '<leader>sf', function()
-        FzfLua.files { cmd = table.concat(utils.get_fd_command(), ' ') }
-      end, { desc = 'Find Files' })
+      vim.keymap.set('n', '<leader>sf', function() FzfLua.files { cmd = table.concat(utils.get_fd_command(), ' ') } end, { desc = 'Find Files' })
       vim.keymap.set('n', '<leader>sF', FzfLua.git_files, { desc = 'Find Git Files' })
       vim.keymap.set('n', '<leader>sb', FzfLua.buffers, { desc = 'Select Open Buffer' })
       vim.keymap.set('n', '<leader>sB', FzfLua.blines, { desc = 'Buffer Lines' })
@@ -292,16 +282,43 @@ require('lazy').setup({
           },
         },
         ty = {},
+        bashls = {},
+        yamlls = {},
+        lua_ls = {
+          -- Special Lua Config, as recommended by neovim help docs
+          on_init = function(client)
+            if client.workspace_folders then
+              local path = client.workspace_folders[1].name
+              if path ~= vim.fn.stdpath 'config' and (vim.uv.fs_stat(path .. '/.luarc.json') or vim.uv.fs_stat(path .. '/.luarc.jsonc')) then return end
+            end
+
+            client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
+              runtime = {
+                version = 'LuaJIT',
+                path = { 'lua/?.lua', 'lua/?/init.lua' },
+              },
+              workspace = {
+                checkThirdParty = false,
+                -- NOTE: this is a lot slower and will cause issues when working on your own configuration.
+                --  See https://github.com/neovim/nvim-lspconfig/issues/3189
+                library = vim.api.nvim_get_runtime_file('', true),
+              },
+            })
+          end,
+          settings = {
+            Lua = {},
+          },
+        },
       }
 
-      local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, {
-        'lua-language-server', -- Lua Language server
-        'stylua', -- Used to format Lua code
-        'yaml-language-server', -- YAML Language server
-        -- You can add other tools here that you want Mason to install
-      })
-      servers.yamlls = {}
+      local ensure_installed = {
+        'clangd',
+        'gopls',
+        'lua-language-server',
+        'stylua',
+        'yaml-language-server',
+        'bash-language-server',
+      }
 
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -311,32 +328,6 @@ require('lazy').setup({
         vim.lsp.enable(name)
       end
 
-      -- Special Lua Config, as recommended by neovim help docs
-      vim.lsp.config('lua_ls', {
-        on_init = function(client)
-          if client.workspace_folders then
-            local path = client.workspace_folders[1].name
-            if path ~= vim.fn.stdpath 'config' and (vim.uv.fs_stat(path .. '/.luarc.json') or vim.uv.fs_stat(path .. '/.luarc.jsonc')) then return end
-          end
-
-          client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
-            runtime = {
-              version = 'LuaJIT',
-              path = { 'lua/?.lua', 'lua/?/init.lua' },
-            },
-            workspace = {
-              checkThirdParty = false,
-              -- NOTE: this is a lot slower and will cause issues when working on your own configuration.
-              --  See https://github.com/neovim/nvim-lspconfig/issues/3189
-              library = vim.api.nvim_get_runtime_file('', true),
-            },
-          })
-        end,
-        settings = {
-          Lua = {},
-        },
-      })
-      vim.lsp.enable 'lua_ls'
     end,
   },
 
