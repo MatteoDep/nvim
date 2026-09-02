@@ -92,7 +92,37 @@ require('lazy').setup({
       { '<leader>z', function() Snacks.zen() end, desc = 'Toggle Zen Mode' },
       { '<A-z>', function() Snacks.zen.zoom() end, desc = 'Toggle Zoom', mode = { 'n', 't', 'i' } },
       { '<leader>.', function() Snacks.scratch() end, desc = 'Toggle Scratch Buffer' },
-      { '<leader>S', function() Snacks.scratch.select() end, desc = 'Select Scratch Buffer' },
+      { '<leader>S', function()
+        local items = Snacks.scratch.list()
+        local map = {}
+        local entries = {}
+        for _, item in ipairs(items) do
+          local label = string.format('%s %s (%s) %s', item.icon or '', item.name, item.ft, item.cwd or '')
+          map[label] = item
+          table.insert(entries, label)
+        end
+        local builtin = require 'fzf-lua.previewer.builtin'
+        local Previewer = builtin.buffer_or_file:extend()
+        function Previewer:new(o, opts, fzf_win)
+          Previewer.super.new(self, o, opts, fzf_win)
+          setmetatable(self, Previewer)
+          return self
+        end
+        function Previewer:parse_entry(entry_str)
+          local item = map[entry_str]
+          return item and { path = item.file } or {}
+        end
+        FzfLua.fzf_exec(entries, {
+          prompt = 'Scratch> ',
+          previewer = Previewer,
+          actions = {
+            ['default'] = function(selected)
+              local item = map[selected[1]]
+              if item then Snacks.scratch(item) end
+            end,
+          },
+        })
+      end, desc = 'Select Scratch Buffer' },
       { '<leader>n', function() Snacks.notifier.show_history() end, desc = 'Notification History' },
       { 'XX', function() Snacks.bufdelete() end, desc = 'Delete Buffer' },
       { '<leader>rn', function() Snacks.rename.rename_file() end, desc = 'Rename File' },
@@ -119,6 +149,7 @@ require('lazy').setup({
 
   {
     'ibhagwan/fzf-lua',
+    event = 'VeryLazy',
     -- optional for icon support
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     -- or if using mini.icons/mini.nvim
