@@ -71,13 +71,53 @@ return {
           end
           vim.uv.fs_write(fd, table.concat({
             '# One "name: url" per line, no quoting. {{dbname}} = pick the database when connecting.',
-            '# local: postgresql://user:pass@localhost:5432/{{dbname}}',
+            '# Saving syncs ~/.pg_service.conf (read-only for tools like pgro); end a line with "# rw" to allow writes.',
+            '# local: postgresql://user:pass@localhost:5432/{{dbname}}  # rw',
             '',
           }, '\n'))
           vim.uv.fs_close(fd)
         end
         vim.cmd.edit(vim.fn.fnameescape(connections_path))
       end
+
+      -- Generate ~/.pg_service.conf + per-connection passfiles (see scripts/dadbod_sync.lua),
+      -- so tools can connect by name (`psql service=<name>`, `pgro`) without seeing passwords
+      local sync_script = vim.fn.stdpath 'config' .. '/scripts/dadbod_sync.lua'
+      local function sync_pgpass()
+        vim.system({ vim.v.progpath, '--clean', '-l', sync_script }, { text = true }, function(res)
+          local msg = vim.trim((res.stdout or '') .. (res.stderr or ''))
+          local level = res.code == 0 and vim.log.levels.INFO or vim.log.levels.WARN
+          vim.schedule(function() vim.notify(msg, level) end)
+        end)
+      end
+
+      local function is_connections_file(path)
+        if path == '' then return false end
+        path = vim.fn.fnamemodify(path, ':p')
+        return (vim.uv.fs_realpath(path) or path) == (vim.uv.fs_realpath(connections_path) or connections_path)
+      end
+      -- Keep plaintext credentials out of undo and swap files (turning 'swapfile' off
+      -- also deletes an existing swap file, for buffers loaded before this config ran)
+      local function protect(buf)
+        if is_connections_file(vim.api.nvim_buf_get_name(buf)) then
+          vim.bo[buf].undofile = false
+          vim.bo[buf].swapfile = false
+        end
+      end
+      for _, buf in ipairs(vim.api.nvim_list_bufs()) do protect(buf) end
+      local group = vim.api.nvim_create_augroup('dadbod_connections', { clear = true })
+      vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufReadPre' }, {
+        group = group,
+        pattern = '*.yaml',
+        callback = function(ev) protect(ev.buf) end,
+      })
+      vim.api.nvim_create_autocmd('BufWritePost', {
+        group = group,
+        pattern = '*.yaml',
+        callback = function(ev)
+          if is_connections_file(ev.file) then sync_pgpass() end
+        end,
+      })
 
       local function select_connection(buf, callback)
         local ok, lines = pcall(vim.fn.readfile, connections_path)
@@ -91,7 +131,7 @@ return {
         for _, line in ipairs(lines) do
           local name, url = line:match '^([^%s#:][^%s:]*):%s*(.+)$'
           if name and url then
-            url = vim.trim(url)
+            url = vim.trim((url:gsub('%s+#.*$', ''))) -- drop trailing ` # tags` (e.g. `# rw`, see dadbod_sync.lua)
             connections[name] = url
             table.insert(names, name)
           end
@@ -235,7 +275,7 @@ return {
             local script = vim.fn.stdpath 'config' .. '/scripts/pg_import.sh'
             local cmd = string.format('sh %s %q %q %q', script, url, table_name, file_name)
 
-            vim.notify('Importing ' .. file_name .. ' into ' .. table_name .. ' using ' .. url .. '...', vim.log.levels.INFO)
+            vim.notify('Importing ' .. file_name .. ' into ' .. table_name .. '...', vim.log.levels.INFO)
 
             vim.fn.jobstart(cmd, {
               stdout_buffered = true,
@@ -261,6 +301,7 @@ return {
       -- Command: :PgImport [url]
       vim.api.nvim_create_user_command('PgImport', function(opts) pg_import(opts.args ~= '' and opts.args or nil) end, { nargs = '?' })
       vim.api.nvim_create_user_command('DBConnections', edit_connections, {})
+      vim.api.nvim_create_user_command('DBSyncPgpass', sync_pgpass, {})
       vim.keymap.set({ 'n', 'v' }, '<leader>qr', execute_query, { desc = '[r]un query' })
       vim.keymap.set('n', '<leader>qs', function() select_connection(vim.api.nvim_get_current_buf()) end, { desc = '[s]elect connection' })
       vim.keymap.set('n', '<leader>qd', function() select_db(vim.api.nvim_get_current_buf()) end, { desc = '[d]atabase select' })
