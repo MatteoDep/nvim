@@ -7,13 +7,20 @@ return {
     version = '*',
     event = 'VimEnter',
     config = function()
-      local function set_db(name, base_url, final_url)
-        vim.b.db          = final_url
-        vim.b.db_name     = name
-        vim.b.db_base_url = base_url
+      -- Every function below takes the buffer explicitly: pickers and the psql fetch are async,
+      -- so the current buffer when a callback runs may not be the one the action started from.
+      local function set_db(buf, name, base_url, final_url)
+        if not vim.api.nvim_buf_is_valid(buf) then
+          vim.notify('Buffer closed; connection not set', vim.log.levels.WARN)
+          return false
+        end
+        vim.b[buf].db          = final_url
+        vim.b[buf].db_name     = name
+        vim.b[buf].db_base_url = base_url
         local dbname = final_url:match '.*/([^/?]+)'
         local label  = (base_url and dbname) and (name .. ' / ' .. dbname) or name
         vim.notify('db = ' .. label, vim.log.levels.INFO)
+        return true
       end
 
       local function select_db_for_url(url, callback)
@@ -48,26 +55,50 @@ return {
         })
       end
 
-      local function select_connection(callback)
-        local config_path = './connections.yaml'
-        local ok, lines = pcall(vim.fn.readfile, config_path)
+      -- Kept outside the nvim repo so credentials never get committed
+      local config_home = vim.env.XDG_CONFIG_HOME
+      if not config_home or config_home == '' then config_home = vim.fn.expand '~/.config' end
+      local connections_path = config_home .. '/dadbod/connections.yaml'
+
+      local function edit_connections()
+        if not vim.uv.fs_stat(connections_path) then
+          vim.fn.mkdir(vim.fn.fnamemodify(connections_path, ':h'), 'p', tonumber('700', 8))
+          -- 'wx' + 600: create exclusively, never readable by others
+          local fd, err = vim.uv.fs_open(connections_path, 'wx', tonumber('600', 8))
+          if not fd then
+            vim.notify('Could not create ' .. connections_path .. ': ' .. err, vim.log.levels.ERROR)
+            return
+          end
+          vim.uv.fs_write(fd, table.concat({
+            '# One "name: url" per line, no quoting. {{dbname}} = pick the database when connecting.',
+            '# local: postgresql://user:pass@localhost:5432/{{dbname}}',
+            '',
+          }, '\n'))
+          vim.uv.fs_close(fd)
+        end
+        vim.cmd.edit(vim.fn.fnameescape(connections_path))
+      end
+
+      local function select_connection(buf, callback)
+        local ok, lines = pcall(vim.fn.readfile, connections_path)
         if not ok then
-          vim.notify('Could not read ' .. config_path, vim.log.levels.ERROR)
+          vim.notify('Could not read ' .. connections_path .. ' (<leader>qe to create)', vim.log.levels.ERROR)
           return
         end
 
         local connections = {}
         local names = {}
         for _, line in ipairs(lines) do
-          local name, url = line:match '^(%S+):%s*(.+)$'
+          local name, url = line:match '^([^%s#:][^%s:]*):%s*(.+)$'
           if name and url then
+            url = vim.trim(url)
             connections[name] = url
             table.insert(names, name)
           end
         end
 
         if #names == 0 then
-          vim.notify('No connections found in connections.yaml', vim.log.levels.WARN)
+          vim.notify('No connections found in ' .. connections_path, vim.log.levels.WARN)
           return
         end
 
@@ -76,104 +107,116 @@ return {
           local url = connections[selected]
           if url:find('{{dbname}}', 1, true) then
             select_db_for_url(url, function(final_url)
-              if final_url then
-                set_db(selected, url, final_url)
+              if final_url and set_db(buf, selected, url, final_url) then
                 if callback then callback(final_url) end
               end
             end)
           else
-            set_db(selected, nil, url)
-            if callback then callback(url) end
+            if set_db(buf, selected, nil, url) and callback then callback(url) end
           end
         end)
       end
 
-      local function select_db(cb)
-        if not vim.b.db_base_url then
+      local function select_db(buf, cb)
+        local base_url, name = vim.b[buf].db_base_url, vim.b[buf].db_name
+        if not base_url then
           vim.notify('No template URL; select a connection first', vim.log.levels.WARN)
           return
         end
-        select_db_for_url(vim.b.db_base_url, function(final_url)
-          if final_url then
-            set_db(vim.b.db_name, vim.b.db_base_url, final_url)
-            if cb then cb() end
+        select_db_for_url(base_url, function(final_url)
+          if final_url and set_db(buf, name, base_url, final_url) then
+            if cb then cb(final_url) end
           end
         end)
       end
 
-      local function check_connection(cb)
-        if not vim.b.db then
-          select_connection(cb)
+      -- Confirm (or change) the buffer's connection, then call cb(url)
+      local function check_connection(buf, cb)
+        local db, base_url = vim.b[buf].db, vim.b[buf].db_base_url
+        if not db then
+          select_connection(buf, cb)
         else
-          local label = vim.b.db_name or vim.b.db or '(none)'
-          if vim.b.db_base_url then
-            local dbname = vim.b.db:match '.*/([^/?]+)'
+          local label = vim.b[buf].db_name or db
+          if base_url then
+            local dbname = db:match '.*/([^/?]+)'
             if dbname then label = label .. ' / ' .. dbname end
           end
           local opts = { 'Run', 'Change connection', 'Abort' }
-          if vim.b.db_base_url then table.insert(opts, 2, 'Change database') end
+          if base_url then table.insert(opts, 2, 'Change database') end
           vim.ui.select(opts, { prompt = label .. '> ' }, function(selected)
             if selected == 'Run' then
-              cb()
+              cb(db)
             elseif selected == 'Change database' then
-              select_db(cb)
+              select_db(buf, cb)
             elseif selected == 'Change connection' then
-              select_connection(cb)
+              select_connection(buf, cb)
             end
           end)
         end
       end
 
-      local function execute_query()
-        local mode = vim.api.nvim_get_mode().mode
-        local in_visual = mode:find '^[vV\22]'
-        if in_visual then vim.cmd 'normal! \27' end -- exit visual to save '< '>
-        local pos = vim.api.nvim_win_get_cursor(0)
+      local preview_ns = vim.api.nvim_create_namespace 'dadbod_preview'
+      local preview_group = vim.api.nvim_create_augroup('dadbod_preview', { clear = true })
 
-        -- Determine query range: for normal mode, temporarily select the paragraph
-        if not in_visual then
-          vim.cmd 'normal! vip'
-          vim.cmd('normal! \27')
-          vim.api.nvim_win_set_cursor(0, pos)
+      local function execute_query()
+        local win = vim.api.nvim_get_current_win()
+        local buf = vim.api.nvim_get_current_buf()
+        local in_visual = vim.api.nvim_get_mode().mode:find '^[vV\22]'
+
+        -- Work out the line range once, here. Re-selecting it after the dialog is unreliable:
+        -- smooth scrolling (snacks.scroll) can move the cursor while visual mode is active and
+        -- shrink the selection (e.g. a DELETE running without its WHERE lines).
+        if in_visual then
+          vim.cmd 'normal! \27' -- leaving visual mode sets '< and '>
+        else
+          local view = vim.fn.winsaveview()
+          vim.cmd 'normal! vip\27'
+          vim.fn.winrestview(view)
+        end
+        local first = vim.api.nvim_buf_get_mark(buf, '<')[1]
+        local last = vim.api.nvim_buf_get_mark(buf, '>')[1]
+        -- Ex widens a range to cover closed folds, so do it here too: highlight = what runs
+        if vim.fn.foldclosed(first) ~= -1 then first = vim.fn.foldclosed(first) end
+        if vim.fn.foldclosedend(last) ~= -1 then last = vim.fn.foldclosedend(last) end
+        local query = vim.api.nvim_buf_get_lines(buf, first - 1, last, true)
+        if vim.trim(table.concat(query, '\n')) == '' then
+          vim.notify('No query under cursor', vim.log.levels.WARN)
+          return
         end
 
         -- Highlight the query so the user can see what will run
-        local ns = vim.api.nvim_create_namespace 'dadbod_preview'
-        vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)
-        local s = vim.api.nvim_buf_get_mark(0, '<')
-        local e = vim.api.nvim_buf_get_mark(0, '>')
-        vim.api.nvim_buf_set_extmark(0, ns, s[1] - 1, 0, {
-          end_row = e[1] - 1,
-          end_col = #vim.api.nvim_buf_get_lines(0, e[1] - 1, e[1], true)[1],
+        local function clear_hl()
+          if vim.api.nvim_buf_is_valid(buf) then vim.api.nvim_buf_clear_namespace(buf, preview_ns, 0, -1) end
+          vim.api.nvim_clear_autocmds { group = preview_group }
+        end
+        clear_hl()
+        vim.api.nvim_buf_set_extmark(buf, preview_ns, first - 1, 0, {
+          end_row = last - 1,
+          end_col = #query[#query],
           hl_group = 'Visual',
         })
-
-        local function clear_hl()
-          vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)
-        end
-
         -- Clear highlight on cursor move in case the user aborts
-        vim.api.nvim_create_autocmd('CursorMoved', {
-          buffer = 0,
-          once = true,
-          callback = clear_hl,
-        })
+        vim.api.nvim_create_autocmd('CursorMoved', { group = preview_group, buffer = buf, once = true, callback = clear_hl })
 
-        check_connection(function()
+        check_connection(buf, function()
           clear_hl()
-          vim.api.nvim_win_set_cursor(0, pos)
-          if in_visual then
-            vim.cmd 'normal! gv'
-          else
-            vim.cmd 'norm! vip'
+          if not (vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == buf) then
+            vim.notify('Query window closed or showing another buffer; not running', vim.log.levels.WARN)
+            return
           end
-          vim.fn.feedkeys ':DB\r'
+          if not vim.deep_equal(vim.api.nvim_buf_get_lines(buf, first - 1, last, false), query) then
+            vim.notify('Query changed since it was selected; not running', vim.log.levels.WARN)
+            return
+          end
+          vim.api.nvim_set_current_win(win)
+          local ok, err = pcall(vim.cmd, ('%d,%dDB'):format(first, last))
+          if not ok then vim.notify(tostring(err), vim.log.levels.ERROR) end
         end)
       end
 
       local function pg_import(url)
         if not url then
-          check_connection(function(selected_url)
+          check_connection(vim.api.nvim_get_current_buf(), function(selected_url)
             if not selected_url then return end
             pg_import(selected_url)
           end)
@@ -216,10 +259,12 @@ return {
       end
 
       -- Command: :PgImport [url]
-      vim.api.nvim_create_user_command('PgImport', function(opts) pg_import(opts.args) end, { nargs = '?' })
+      vim.api.nvim_create_user_command('PgImport', function(opts) pg_import(opts.args ~= '' and opts.args or nil) end, { nargs = '?' })
+      vim.api.nvim_create_user_command('DBConnections', edit_connections, {})
       vim.keymap.set({ 'n', 'v' }, '<leader>qr', execute_query, { desc = '[r]un query' })
-      vim.keymap.set('n', '<leader>qs', select_connection, { desc = '[s]elect connection' })
-      vim.keymap.set('n', '<leader>qd', select_db, { desc = '[d]atabase select' })
+      vim.keymap.set('n', '<leader>qs', function() select_connection(vim.api.nvim_get_current_buf()) end, { desc = '[s]elect connection' })
+      vim.keymap.set('n', '<leader>qd', function() select_db(vim.api.nvim_get_current_buf()) end, { desc = '[d]atabase select' })
+      vim.keymap.set('n', '<leader>qe', edit_connections, { desc = '[e]dit connections' })
     end,
   },
 }
