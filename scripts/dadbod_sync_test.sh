@@ -34,13 +34,13 @@ same_port_same_target:
 rw_tunnel:
   url: postgresql://u:pw@localhost:15434/app
   rw: true
-  tunnel: { kube: ns/sts/pg-0, context: client-prod }
+  tunnel: { kube: ns/sts/pg-0, context: prod-ctx }
 local:
   url: "postgresql://u:p#w@localhost:5432/app"
   rw: true
 port_clash:
   url: postgresql://u:pw@localhost:15433/app
-  tunnel: { kube: other/svc/postgres, context: client-test }
+  tunnel: { kube: other/svc/postgres, context: test-ctx }
 tunnel_5432:
   url: postgresql://u:pw@localhost:5432/app
   tunnel: { kube: ns/svc/pg, context: c }
@@ -65,7 +65,7 @@ check "sync exits 2 when connections are skipped" '[ "$(cat "$tmp/code")" = 2 ]'
 check "short form works, read-only" 'section short | grep -q "^options=.*default_transaction_read_only=on" && [ -z "$(markers short)" ]'
 check "tunnel marker written" '[ "$(markers ro_tunnel)" = "# dadbod: tunnel kube arn:aws:eks:eu-west-1:123:cluster/x data svc/postgres 15433 5433" ]'
 check "same port, same target allowed" 'markers same_port_same_target | grep -q "tunnel kube"'
-check "rw + tunnel: both markers, remote port default 5432" '[ "$(markers rw_tunnel)" = "# dadbod: tunnel kube client-prod ns sts/pg-0 15434 5432
+check "rw + tunnel: both markers, remote port default 5432" '[ "$(markers rw_tunnel)" = "# dadbod: tunnel kube prod-ctx ns sts/pg-0 15434 5432
 # dadbod: read-write" ]'
 check "password with # in quoted url" 'grep -q "p#w" "$XDG_CONFIG_HOME/dadbod/pgpass.d/local"'
 check "local is read-write" 'markers local | grep -q read-write'
@@ -94,7 +94,7 @@ cat >"$conn" <<'EOF'
 # local: postgresql://user:pass@localhost:5432/{{dbname}}  # rw
 # my own note
 local: postgresql://u:p"w\x#1@localhost:5432/{{dbname}}  # rw
-client_prod: postgresql://u:pw@localhost:15433/db  # kube=data/svc/pg:5433 ctx=client-prod
+remote_prod: postgresql://u:pw@localhost:15433/db  # kube=data/svc/pg:5433 ctx=prod-ctx
 no_ctx: postgresql://u:pw@localhost:15434/db  # kube=data/svc/pg
 plain: postgresql://u:pw@db.example.com/db
 odd: postgresql://u:pw@db.example.com/db  # rw foo=bar
@@ -107,12 +107,12 @@ check "migration warns about kube= without ctx=" 'grep -q "no_ctx" "$tmp/out"'
 check "backup kept, mode 600" 'b=$(ls "$XDG_CONFIG_HOME"/dadbod/connections.yaml.bak-*) && cmp -s "$b" "$tmp/old" && [ "$(stat -c %a "$conn")" = 600 ]'
 check "own comment kept, old header dropped" 'grep -q "^# my own note" "$conn" && ! grep -q "no quoting" "$conn"'
 check "url round-trips" '[ "$(yq ".local.url" "$conn")" = "postgresql://u:p\"w\\x#1@localhost:5432/{{dbname}}" ]'
-check "rw and tunnel converted" '[ "$(yq ".local.rw" "$conn")" = true ] && [ "$(yq ".client_prod.tunnel.kube + \" \" + .client_prod.tunnel.context" "$conn")" = "data/svc/pg:5433 client-prod" ]'
+check "rw and tunnel converted" '[ "$(yq ".local.rw" "$conn")" = true ] && [ "$(yq ".remote_prod.tunnel.kube + \" \" + .remote_prod.tunnel.context" "$conn")" = "data/svc/pg:5433 prod-ctx" ]'
 check "unknown tags kept as a comment" 'grep -q "foo=bar" "$conn"'
 migrate
 check "second migration refused" '[ "$(cat "$tmp/code")" = 1 ]'
 sync
-check "sync after migration: only no_ctx skipped" '[ "$(grep -c skipped "$tmp/out")" = 1 ] && grep -q "skipped no_ctx" "$tmp/out" && markers client_prod | grep -q "tunnel kube client-prod data svc/pg 15433 5433"'
+check "sync after migration: only no_ctx skipped" '[ "$(grep -c skipped "$tmp/out")" = 1 ] && grep -q "skipped no_ctx" "$tmp/out" && markers remote_prod | grep -q "tunnel kube prod-ctx data svc/pg 15433 5433"'
 
 echo
 [ $fails -eq 0 ] && echo "all passed" || { echo "$fails failed"; exit 1; }

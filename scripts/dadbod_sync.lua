@@ -5,7 +5,7 @@
 --
 -- connections.yaml (parsed with yq), connection names as keys:
 --   local: postgresql://user:pass@localhost:5432/{{dbname}}      # short form: just the URL
---   client_prod:
+--   remote_prod:
 --     url: postgresql://user:pass@localhost:15433/{{dbname}}
 --     rw: true                                 # optional, default false
 --     tunnel:                                  # optional: kubectl port-forward (dbtunnel)
