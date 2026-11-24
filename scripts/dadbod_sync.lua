@@ -3,12 +3,24 @@
 --
 --   nvim -l dadbod_sync.lua
 --
+-- connections.yaml (parsed with yq), connection names as keys:
+--   local: postgresql://user:pass@localhost:5432/{{dbname}}      # short form: just the URL
+--   client_prod:
+--     url: postgresql://user:pass@localhost:15433/{{dbname}}
+--     rw: true                                 # optional, default false
+--     tunnel:                                  # optional: kubectl port-forward (dbtunnel)
+--       kube: <ns>/<svc|pod|deploy|sts>/<name>[:<remote port, default 5432>]
+--       context: <kube context>
+--
 -- Writes:
 --   ~/.pg_service.conf (or $PGSERVICEFILE): one [name] section per connection, inside a
 --     "# BEGIN dadbod" / "# END dadbod" block; anything outside the block is kept.
---     Every service is read-only and has timeouts, except connections tagged `# rw` at the
---     end of their line (`local: postgresql://...  # rw`): those are marked "# dadbod:
---     read-write" and get neither, and `pgro` lets anything through on them.
+--     Every service is read-only and has timeouts, except connections with `rw: true`:
+--     those are marked "# dadbod: read-write" and get neither, and `pgro` lets anything
+--     through on them. Connections with a tunnel get a "# dadbod: tunnel kube <context>
+--     <ns> <type>/<name> <local port> <remote port>" marker, read by pgro and dbtunnel; the URL
+--     must point at localhost (not port 5432, the local server), and tunnels sharing a local
+--     port must have the same target.
 --   $XDG_CONFIG_HOME/dadbod/pgpass.d/<name>: one pgpass line per connection (mode 600),
 --     referenced by the service's `passfile=`. ~/.pgpass is never touched.
 --
@@ -77,9 +89,71 @@ local function parse_url(url)
     c.params[#c.params + 1] = { k, v }
   end
   if c.host == '' then return nil, 'no host (unix sockets are not supported)' end
-  if c.host:find '[\r\n]' or (c.user or ''):find '[\r\n]' then return nil, 'invalid characters' end
+  -- a newline would inject lines (even markers) into the service or pgpass file
+  for _, v in ipairs { c.host, c.user or '', c.dbname or '', c.password or '' } do
+    if v:find '[\r\n]' then return nil, 'invalid characters' end
+  end
   if not c.user or c.user == '' then c.user = vim.env.USER end
   return c
+end
+
+local KUBE_TYPES = { svc = true, service = true, pod = true, deploy = true, deployment = true, sts = true, statefulset = true }
+local LOCALHOST = { localhost = true, ['127.0.0.1'] = true, ['::1'] = true }
+
+-- Check a connection's `tunnel:` against its parsed URL. Returns the marker line, or nil, reason.
+local function tunnel_marker(t, c)
+  local ns, kind, res, rport = t.kube:match '^([%l%d][%l%d.-]*)/(%l+)/([%l%d][%l%d.-]*):?(%d*)$'
+  if not ns or not KUBE_TYPES[kind] then return nil, 'tunnel.kube must be <ns>/<svc|pod|deploy|sts>/<name>[:<port>]' end
+  if rport == '' then rport = '5432' end
+  if tonumber(rport) > 65535 then return nil, 'invalid tunnel.kube port' end
+  if not t.context:match '^[%w][%w_.:@/-]*$' then return nil, 'invalid tunnel.context' end
+  if not LOCALHOST[c.host] then return nil, 'a tunnel needs a localhost URL' end
+  if c.port == '5432' then return nil, 'a tunnel cannot use local port 5432 (the local server)' end
+  return table.concat({ '# dadbod: tunnel kube', t.context, ns, kind .. '/' .. res, c.port, rport }, ' ')
+end
+
+-- Check one connections.yaml value: a URL string or a mapping. Returns { url, rw, tunnel } or nil, reason.
+local function check_entry(v)
+  if type(v) == 'string' then return { url = v } end
+  if type(v) ~= 'table' or vim.islist(v) then return nil, 'must be a URL or a mapping with url:' end
+  for k in pairs(v) do
+    if k ~= 'url' and k ~= 'rw' and k ~= 'tunnel' then return nil, 'unknown key "' .. k .. '"' end
+  end
+  if type(v.url) ~= 'string' then return nil, 'url: missing or not a string' end
+  if v.rw ~= nil and type(v.rw) ~= 'boolean' then return nil, 'rw: must be true or false' end
+  local t = v.tunnel
+  if t ~= nil then
+    if type(t) ~= 'table' or vim.islist(t) then return nil, 'tunnel: must be a mapping' end
+    for k in pairs(t) do
+      if k ~= 'kube' and k ~= 'context' then return nil, 'unknown key "tunnel.' .. k .. '"' end
+    end
+    if type(t.kube) ~= 'string' or type(t.context) ~= 'string' then
+      return nil, 'tunnel: needs kube: and context:'
+    end
+  end
+  return v
+end
+
+-- The connections as a list of { key = name, value = ... } in file order, or nil, reason
+local function load_entries(path, lines)
+  -- the old one-line format kept `# rw` / `kube=` tags in comments, which YAML drops
+  for _, line in ipairs(lines) do
+    local tags = line:match '^[^%s#][^%s:]*:%s*%S.-%s#(.*)$'
+    if tags and ((' ' .. tags .. ' '):find '%srw%s' or tags:find 'kube=') then
+      return nil, 'connections.yaml still has "# rw" / "kube=" tags: convert it with scripts/dadbod_migrate.lua'
+    end
+  end
+  if vim.fn.executable 'yq' == 0 then return nil, 'yq is not installed' end
+  local res = vim.system({ 'yq', '-o=json', 'to_entries', path }, { text = true }):wait()
+  if res.code ~= 0 then
+    -- yq messages may quote the file: keep only the position
+    local line = (res.stderr or ''):match 'L(%d+)' or (res.stderr or ''):match 'line (%d+)'
+    return nil, 'cannot parse connections.yaml' .. (line and (' (line ' .. line .. ')') or '')
+  end
+  if vim.trim(res.stdout) == '' then return {} end -- empty or only comments
+  local ok, entries = pcall(vim.json.decode, res.stdout)
+  if not ok or type(entries) ~= 'table' then return nil, 'unexpected yq output' end
+  return entries
 end
 
 local function read_lines(path)
@@ -111,49 +185,65 @@ local function main()
     return 1
   end
 
+  local entries, err = load_entries(connections_path, lines)
+  if not entries then
+    io.stderr:write('dadbod sync: ' .. err .. ' (nothing changed)\n')
+    return 1
+  end
+
   local services, passfiles, skipped, seen = {}, {}, {}, {}
-  for _, line in ipairs(lines) do
-    local name, url = line:match '^([^%s#:][^%s:]*):%s*(.+)$'
-    if name then
-      -- trailing ` # tag ...` (a '#' inside a URL must be percent-encoded anyway)
-      local tags = url:match '%s#(.*)$' or ''
-      url = url:gsub('%s+#.*$', '')
-      local rw = (' ' .. tags .. ' '):find '%srw%s' ~= nil
-      local c, reason
-      if not name:match '^[%w_.-]+$' then
-        reason = 'name must only contain letters, digits, "_", "." or "-"'
-      elseif seen[name] then
-        reason = 'duplicate name'
-      else
-        c, reason = parse_url(vim.trim(url))
-      end
-      seen[name] = true
-      if not c then
-        skipped[#skipped + 1] = name .. ': ' .. reason
-      else
-        local options = rw and '' or READ_ONLY
-        local s = { '[' .. name .. ']', 'host=' .. c.host, 'port=' .. c.port, 'user=' .. c.user }
-        if rw then table.insert(s, 1, RW_MARK) end
-        if c.dbname then s[#s + 1] = 'dbname=' .. c.dbname end
-        for _, kv in ipairs(c.params) do
-          if kv[1] == 'options' then
-            -- the URL's own options go first: for repeated settings the last -c wins
-            options = vim.trim(kv[2] .. ' ' .. options)
-          else
-            s[#s + 1] = kv[1] .. '=' .. kv[2]
-          end
+  local tunnel_ports = {} -- local port -> marker of the first tunnel on it
+  for _, e in ipairs(entries) do
+    local name = e.key
+    local c, reason, conf, marker
+    if type(name) ~= 'string' then
+      name, reason = tostring(name), 'the file must be a mapping of connection names'
+    elseif not name:match '^[%w_.-]+$' then
+      reason = 'name must only contain letters, digits, "_", "." or "-"'
+    elseif seen[name] then
+      reason = 'duplicate name'
+    else
+      conf, reason = check_entry(e.value)
+      if conf then c, reason = parse_url(vim.trim(conf.url)) end
+      if c and conf.tunnel then
+        marker, reason = tunnel_marker(conf.tunnel, c)
+        if marker and tunnel_ports[c.port] and tunnel_ports[c.port] ~= marker then
+          marker, reason = nil, 'local port ' .. c.port .. ' is already used by a tunnel with another target'
         end
-        if options ~= '' then s[#s + 1] = 'options=' .. options end
-        if c.password then
-          local passfile = pgpass_dir .. '/' .. name
-          s[#s + 1] = 'passfile=' .. passfile
-          -- the file belongs to this connection only: any database (`pgro -d other`)
-          passfiles[name] = table.concat({
-            pgpass_escape(c.host), c.port, '*', pgpass_escape(c.user), pgpass_escape(c.password),
-          }, ':') .. '\n'
-        end
-        services[#services + 1] = table.concat(s, '\n')
+        if not marker then c = nil end
       end
+    end
+    seen[name] = true
+    if not c then
+      skipped[#skipped + 1] = name .. ': ' .. reason
+    else
+      local rw = conf.rw == true
+      local options = rw and '' or READ_ONLY
+      local s = { '[' .. name .. ']', 'host=' .. c.host, 'port=' .. c.port, 'user=' .. c.user }
+      if rw then table.insert(s, 1, RW_MARK) end
+      if marker then
+        table.insert(s, 1, marker)
+        tunnel_ports[c.port] = marker
+      end
+      if c.dbname then s[#s + 1] = 'dbname=' .. c.dbname end
+      for _, kv in ipairs(c.params) do
+        if kv[1] == 'options' then
+          -- the URL's own options go first: for repeated settings the last -c wins
+          options = vim.trim(kv[2] .. ' ' .. options)
+        else
+          s[#s + 1] = kv[1] .. '=' .. kv[2]
+        end
+      end
+      if options ~= '' then s[#s + 1] = 'options=' .. options end
+      if c.password then
+        local passfile = pgpass_dir .. '/' .. name
+        s[#s + 1] = 'passfile=' .. passfile
+        -- the file belongs to this connection only: any database (`pgro -d other`)
+        passfiles[name] = table.concat({
+          pgpass_escape(c.host), c.port, '*', pgpass_escape(c.user), pgpass_escape(c.password),
+        }, ':') .. '\n'
+      end
+      services[#services + 1] = table.concat(s, '\n')
     end
   end
 

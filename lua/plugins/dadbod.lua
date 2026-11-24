@@ -9,7 +9,7 @@ return {
     config = function()
       -- Every function below takes the buffer explicitly: pickers and the psql fetch are async,
       -- so the current buffer when a callback runs may not be the one the action started from.
-      local function set_db(buf, name, base_url, final_url)
+      local function set_db(buf, name, base_url, final_url, tunnel)
         if not vim.api.nvim_buf_is_valid(buf) then
           vim.notify('Buffer closed; connection not set', vim.log.levels.WARN)
           return false
@@ -17,16 +17,38 @@ return {
         vim.b[buf].db          = final_url
         vim.b[buf].db_name     = name
         vim.b[buf].db_base_url = base_url
+        vim.b[buf].db_tunnel   = tunnel or false
         local dbname = final_url:match '.*/([^/?]+)'
         local label  = (base_url and dbname) and (name .. ' / ' .. dbname) or name
         vim.notify('db = ' .. label, vim.log.levels.INFO)
         return true
       end
 
-      local function select_db_for_url(url, callback)
-        local bootstrap = url:gsub('{{dbname}}', 'postgres')
+      -- Start (or check) the connection's kubectl tunnel through dbtunnel, then call cb()
+      local function ensure_tunnel(name, tunnel, cb, quiet)
+        if not tunnel then return cb() end
+        if vim.fn.executable 'dbtunnel' == 0 then
+          return vim.notify('dbtunnel not found in PATH', vim.log.levels.ERROR)
+        end
+        if not quiet then vim.notify('Tunnel for ' .. name .. '...', vim.log.levels.INFO) end
+        vim.system({ 'dbtunnel', 'up', name }, { text = true }, function(res)
+          vim.schedule(function()
+            if res.code == 0 then
+              cb()
+            else
+              vim.notify(vim.trim(res.stderr or '') ~= '' and vim.trim(res.stderr) or ('dbtunnel exit ' .. res.code), vim.log.levels.ERROR)
+            end
+          end)
+        end)
+      end
+      -- before each query: quiet, it is usually just a check of the running tunnel
+      local function with_tunnel(buf, cb) ensure_tunnel(vim.b[buf].db_name, vim.b[buf].db_tunnel, cb, true) end
+
+      -- Lists databases through the synced service (scripts/dadbod_sync.lua), so the password
+      -- never shows in psql's command line
+      local function select_db_for_url(name, url, callback)
         local names = {}
-        vim.fn.jobstart({ 'psql', bootstrap, '-t', '-A', '-c', 'SELECT datname FROM pg_database WHERE datistemplate = false ORDER BY datname;' }, {
+        vim.fn.jobstart({ 'psql', '-X', '-w', '-t', '-A', '-d', 'service=' .. name .. ' dbname=postgres', '-c', 'SELECT datname FROM pg_database WHERE datistemplate = false ORDER BY datname;' }, {
           stdout_buffered = true,
           on_stdout = function(_, data)
             if data then
@@ -39,7 +61,7 @@ return {
           on_exit = function(_, code)
             vim.schedule(function()
               if code ~= 0 or #names == 0 then
-                vim.notify('Could not fetch databases (exit ' .. code .. ')', vim.log.levels.ERROR)
+                vim.notify('Could not fetch databases (exit ' .. code .. '; is the connection synced? :DBSyncPgpass)', vim.log.levels.ERROR)
                 callback(nil)
                 return
               end
@@ -70,9 +92,14 @@ return {
             return
           end
           vim.uv.fs_write(fd, table.concat({
-            '# One "name: url" per line, no quoting. {{dbname}} = pick the database when connecting.',
-            '# Saving syncs ~/.pg_service.conf (read-only for tools like pgro); end a line with "# rw" to allow writes.',
-            '# local: postgresql://user:pass@localhost:5432/{{dbname}}  # rw',
+            '# dadbod connections by name. Saving syncs ~/.pg_service.conf for pgro (see scripts/dadbod_sync.lua).',
+            '#   name: postgresql://user:pass@host:5432/{{dbname}}   # short form; {{dbname}} = pick the database',
+            '#   name:',
+            '#     url: postgresql://user:pass@localhost:15433/db',
+            '#     rw: true                       # allow writes (default read-only)',
+            '#     tunnel:                        # kubectl port-forward, started by pgro/dbtunnel',
+            '#       kube: <ns>/<svc|pod|deploy|sts>/<name>[:<port>]',
+            '#       context: <kube context>',
             '',
           }, '\n'))
           vim.uv.fs_close(fd)
@@ -119,24 +146,34 @@ return {
         end,
       })
 
-      local function select_connection(buf, callback)
-        local ok, lines = pcall(vim.fn.readfile, connections_path)
-        if not ok then
-          vim.notify('Could not read ' .. connections_path .. ' (<leader>qe to create)', vim.log.levels.ERROR)
-          return
-        end
-
-        local connections = {}
-        local names = {}
-        for _, line in ipairs(lines) do
-          local name, url = line:match '^([^%s#:][^%s:]*):%s*(.+)$'
-          if name and url then
-            url = vim.trim((url:gsub('%s+#.*$', ''))) -- drop trailing ` # tags` (e.g. `# rw`, see dadbod_sync.lua)
-            connections[name] = url
-            table.insert(names, name)
+      -- name -> { url, tunnel } and the names in file order (format: see scripts/dadbod_sync.lua)
+      local function load_connections()
+        if not vim.uv.fs_stat(connections_path) then return nil, 'Could not read ' .. connections_path .. ' (<leader>qe to create)' end
+        if vim.fn.executable 'yq' == 0 then return nil, 'yq is not installed (needed to read connections.yaml)' end
+        local res = vim.system({ 'yq', '-o=json', 'to_entries', connections_path }, { text = true }):wait()
+        -- yq messages may quote the file: show only the position
+        local line = (res.stderr or ''):match 'L(%d+)' or (res.stderr or ''):match 'line (%d+)'
+        if res.code ~= 0 then return nil, 'Could not parse connections.yaml' .. (line and (' (line ' .. line .. ')') or '') end
+        local ok, entries = pcall(vim.json.decode, res.stdout ~= '' and res.stdout or '[]')
+        if not ok or type(entries) ~= 'table' then return nil, 'Could not parse connections.yaml' end
+        local connections, names = {}, {}
+        for _, e in ipairs(entries) do
+          local v = e.value
+          if type(v) == 'string' then v = { url = v } end
+          if type(e.key) == 'string' and type(v) == 'table' and type(v.url) == 'string' then
+            connections[e.key] = { url = vim.trim(v.url), tunnel = type(v.tunnel) == 'table' }
+            table.insert(names, e.key)
           end
         end
+        return connections, names
+      end
 
+      local function select_connection(buf, callback)
+        local connections, names = load_connections()
+        if not connections then
+          vim.notify(names, vim.log.levels.ERROR)
+          return
+        end
         if #names == 0 then
           vim.notify('No connections found in ' .. connections_path, vim.log.levels.WARN)
           return
@@ -144,16 +181,18 @@ return {
 
         vim.ui.select(names, { prompt = 'Connection> ' }, function(selected)
           if not selected then return end
-          local url = connections[selected]
-          if url:find('{{dbname}}', 1, true) then
-            select_db_for_url(url, function(final_url)
-              if final_url and set_db(buf, selected, url, final_url) then
-                if callback then callback(final_url) end
-              end
-            end)
-          else
-            if set_db(buf, selected, nil, url) and callback then callback(url) end
-          end
+          local url, tunnel = connections[selected].url, connections[selected].tunnel
+          ensure_tunnel(selected, tunnel, function()
+            if url:find('{{dbname}}', 1, true) then
+              select_db_for_url(selected, url, function(final_url)
+                if final_url and set_db(buf, selected, url, final_url, tunnel) then
+                  if callback then callback(final_url) end
+                end
+              end)
+            else
+              if set_db(buf, selected, nil, url, tunnel) and callback then callback(url) end
+            end
+          end)
         end)
       end
 
@@ -163,10 +202,12 @@ return {
           vim.notify('No template URL; select a connection first', vim.log.levels.WARN)
           return
         end
-        select_db_for_url(base_url, function(final_url)
-          if final_url and set_db(buf, name, base_url, final_url) then
-            if cb then cb(final_url) end
-          end
+        with_tunnel(buf, function()
+          select_db_for_url(name, base_url, function(final_url)
+            if final_url and set_db(buf, name, base_url, final_url, vim.b[buf].db_tunnel) then
+              if cb then cb(final_url) end
+            end
+          end)
         end)
       end
 
@@ -240,25 +281,29 @@ return {
 
         check_connection(buf, function()
           clear_hl()
-          if not (vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == buf) then
-            vim.notify('Query window closed or showing another buffer; not running', vim.log.levels.WARN)
-            return
-          end
-          if not vim.deep_equal(vim.api.nvim_buf_get_lines(buf, first - 1, last, false), query) then
-            vim.notify('Query changed since it was selected; not running', vim.log.levels.WARN)
-            return
-          end
-          vim.api.nvim_set_current_win(win)
-          local ok, err = pcall(vim.cmd, ('%d,%dDB'):format(first, last))
-          if not ok then vim.notify(tostring(err), vim.log.levels.ERROR) end
+          -- the tunnel may have been reaped since the connection was chosen
+          with_tunnel(buf, function()
+            if not (vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == buf) then
+              vim.notify('Query window closed or showing another buffer; not running', vim.log.levels.WARN)
+              return
+            end
+            if not vim.deep_equal(vim.api.nvim_buf_get_lines(buf, first - 1, last, false), query) then
+              vim.notify('Query changed since it was selected; not running', vim.log.levels.WARN)
+              return
+            end
+            vim.api.nvim_set_current_win(win)
+            local ok, err = pcall(vim.cmd, ('%d,%dDB'):format(first, last))
+            if not ok then vim.notify(tostring(err), vim.log.levels.ERROR) end
+          end)
         end)
       end
 
       local function pg_import(url)
         if not url then
-          check_connection(vim.api.nvim_get_current_buf(), function(selected_url)
+          local buf = vim.api.nvim_get_current_buf()
+          check_connection(buf, function(selected_url)
             if not selected_url then return end
-            pg_import(selected_url)
+            with_tunnel(buf, function() pg_import(selected_url) end)
           end)
           return
         end
